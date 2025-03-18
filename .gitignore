@@ -32,7 +32,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-
+https://chatgpt.com/c/67d8eeca-81f0-800a-b2f0-b9b98b89ddb5
 # Symbolication related
 app.*.symbols
 
