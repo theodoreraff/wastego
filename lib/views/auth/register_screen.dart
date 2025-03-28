@@ -15,13 +15,6 @@ class RegisterScreen extends StatelessWidget {
           children: [
             const TextField(
               decoration: InputDecoration(
-                labelText: 'Nama Lengkap',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
                 labelText: 'Alamat Email',
                 border: OutlineInputBorder(),
               ),
