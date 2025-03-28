@@ -6,14 +6,38 @@ class HomeMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Data menu
+    // Data menu dengan warna spesifik
     final List<Map<String, dynamic>> menuItems = [
-      {"icon": LucideIcons.clock, "label": "Jadwal"},
-      {"icon": LucideIcons.recycle, "label": "Recycle"},
-      {"icon": LucideIcons.calendar, "label": "Events"},
-      {"icon": LucideIcons.lightbulb, "label": "Tips"},
-      {"icon": LucideIcons.fileText, "label": "Blog"},
-      {"icon": LucideIcons.heartHandshake, "label": "Donasi"},
+      {
+        "icon": LucideIcons.clock,
+        "label": "Jadwal",
+        "color": const Color(0xFF1E1E1E),
+      },
+      {
+        "icon": LucideIcons.recycle,
+        "label": "Recycle",
+        "color": const Color(0xFF2CCC86),
+      },
+      {
+        "icon": LucideIcons.calendar,
+        "label": "Events",
+        "color": const Color(0xFFAB67F3),
+      },
+      {
+        "icon": LucideIcons.lightbulb,
+        "label": "Tips",
+        "color": const Color(0xFFCC9B00),
+      },
+      {
+        "icon": LucideIcons.fileText,
+        "label": "Blog",
+        "color": const Color(0xFF3DBEE5),
+      },
+      {
+        "icon": LucideIcons.heartHandshake,
+        "label": "Donasi",
+        "color": const Color(0xFFF367E8),
+      },
     ];
 
     return Padding(
@@ -40,13 +64,14 @@ class HomeMenu extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(item["icon"], size: 28, color: Colors.green),
+                  Icon(item["icon"], size: 28, color: item["color"]),
                   const SizedBox(height: 6),
                   Text(
                     item["label"],
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                      color: Colors.black, // Warna teks tetap hitam
                     ),
                   ),
                 ],

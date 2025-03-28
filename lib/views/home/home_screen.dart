@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'components/home_header.dart';
 import 'components/home_menu.dart';
 import 'components/home_stats.dart';
-import '../../widgets/bottom_nav.dart'; // Pastikan path sesuai
+import '../../widgets/bottom_nav.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
