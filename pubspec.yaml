@@ -22,6 +22,8 @@ dependencies:
   intl: ^0.20.2
   lucide_icons: ^0.257.0
   image_picker: any
+  url_launcher: ^6.3.1
+  percent_indicator: ^4.2.2
 
 
 dev_dependencies:
@@ -51,6 +53,8 @@ flutter:
     - assets/images/logo.png
     - assets/images/profile.png
     - assets/images/logotext.png
+    - assets/images/
+    - assets/icons/
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

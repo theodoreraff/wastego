@@ -7,11 +7,11 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(
-          top: 16.0,
-        ), // Memberikan jarak dari kamera depan
+        padding: const EdgeInsets.only(top: 16.0),
         child: Column(
           children: [
             // Navbar
@@ -54,9 +54,7 @@ class HomeHeader extends StatelessWidget {
                             TextSpan(text: 'Waste'),
                             TextSpan(
                               text: 'Go',
-                              style: TextStyle(
-                                color: Color(0xFF8BC34A),
-                              ), // Warna hijau
+                              style: TextStyle(color: Color(0xFF8BC34A)),
                             ),
                           ],
                         ),
@@ -74,7 +72,7 @@ class HomeHeader extends StatelessWidget {
                       const SizedBox(width: 8),
                       ClipOval(
                         child: Image.asset(
-                          'assets/images/profile.png', // Ganti dengan gambar profil
+                          'assets/images/profile.png',
                           width: 32,
                           height: 32,
                           fit: BoxFit.cover,
@@ -107,22 +105,26 @@ class HomeHeader extends StatelessWidget {
                   height: 168,
                   child: Stack(
                     children: [
-                      SvgPicture.asset(
-                        'assets/images/banner.svg',
-                        width: double.infinity,
-                        height: 173,
-                        fit: BoxFit.cover,
+                      // Background SVG full width
+                      Positioned.fill(
+                        child: SvgPicture.asset(
+                          'assets/images/banner.svg',
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topLeft,
+                        ),
                       ),
-                      Positioned(
+
+                      // Text Content
+                      const Positioned(
                         left: 16,
                         top: 24,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               'Selamat Pagi, John',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),

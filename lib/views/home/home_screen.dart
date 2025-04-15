@@ -25,13 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pushNamed(context, '/home');
         break;
       case 1:
-        Navigator.pushNamed(context, '/bantuan');
+        Navigator.pushNamed(context, '/home');
         break;
       case 2:
-        Navigator.pushNamed(context, '/billing');
+        Navigator.pushNamed(context, '/home');
         break;
       case 3:
-        Navigator.pushNamed(context, '/more');
+        Navigator.pushNamed(context, '/home');
         break;
     }
   }
@@ -40,7 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(children: const [HomeHeader(), HomeMenu(), HomeStats()]),
+        child: Column(
+          children: const [
+            HomeHeader(),
+            HomeMenu(),
+            HomeStats(totalSampah: 33),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
