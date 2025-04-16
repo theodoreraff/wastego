@@ -39,6 +39,37 @@ class _RecyclePageState extends State<RecyclePage> {
     });
   }
 
+  void handlePickupRequest() {
+    final hasSelectedItems = itemCounts.values.any((count) => count > 0);
+
+    if (!hasSelectedItems) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: const Text('Tidak Ada Item'),
+              content: const Text(
+                'Silakan pilih setidaknya satu jenis sampah sebelum melanjutkan.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RequestPickupPage(itemCounts: itemCounts),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,9 +136,7 @@ class _RecyclePageState extends State<RecyclePage> {
               text: 'Menghitung',
               backgroundColor: const Color(0xFFB8FF00),
               textColor: Colors.black,
-              onPressed: () {
-                // TODO: implementasi perhitungan
-              },
+              onPressed: () {},
             ),
             const SizedBox(height: 12),
             CustomButton(
@@ -115,14 +144,7 @@ class _RecyclePageState extends State<RecyclePage> {
               backgroundColor: const Color(0xFF003D3D),
               textColor: const Color(0xFFB8FF00),
               icon: Icons.local_shipping_outlined,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => RequestPickupPage(itemCounts: itemCounts),
-                  ),
-                ); // TODO: implementasi permintaan penjemputan
-              },
+              onPressed: handlePickupRequest,
             ),
           ],
         ),
