@@ -39,34 +39,73 @@ class _RecyclePageState extends State<RecyclePage> {
     });
   }
 
-  void handlePickupRequest() {
-    final hasSelectedItems = itemCounts.values.any((count) => count > 0);
+  void showEstimationSheet() {
+    final totalItems = itemCounts.values.fold(0, (sum, count) => sum + count);
 
-    if (!hasSelectedItems) {
-      showDialog(
-        context: context,
-        builder:
-            (_) => AlertDialog(
-              title: const Text('Tidak Ada Item'),
-              content: const Text(
-                'Silakan pilih setidaknya satu jenis sampah sebelum melanjutkan.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
+    if (totalItems == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Isi setidaknya 1 item untuk melihat estimasi.'),
+        ),
       );
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => RequestPickupPage(itemCounts: itemCounts),
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder:
+          (_) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    'Estimasi Penukaran',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...itemCounts.entries
+                    .where((entry) => entry.value > 0)
+                    .map(
+                      (entry) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('${entry.key} (${entry.value}x)'),
+                            Text('Rp${entry.value * 1}'),
+                          ],
+                        ),
+                      ),
+                    ),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Total Estimasi:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Rp${itemCounts.entries.map((e) => e.value * 1).reduce((a, b) => a + b)}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  '*Harga estimasi, bisa berubah tergantung kondisi barang.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
     );
   }
 
@@ -133,10 +172,11 @@ class _RecyclePageState extends State<RecyclePage> {
             }).toList(),
             const SizedBox(height: 16),
             CustomButton(
-              text: 'Menghitung',
+              text: 'Lihat Estimasi',
               backgroundColor: const Color(0xFFB8FF00),
               textColor: Colors.black,
-              onPressed: () {},
+              icon: Icons.calculate_outlined,
+              onPressed: showEstimationSheet,
             ),
             const SizedBox(height: 12),
             CustomButton(
@@ -144,7 +184,14 @@ class _RecyclePageState extends State<RecyclePage> {
               backgroundColor: const Color(0xFF003D3D),
               textColor: const Color(0xFFB8FF00),
               icon: Icons.local_shipping_outlined,
-              onPressed: handlePickupRequest,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RequestPickupPage(itemCounts: itemCounts),
+                  ),
+                );
+              },
             ),
           ],
         ),
