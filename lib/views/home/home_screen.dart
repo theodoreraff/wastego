@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'components/home_header.dart';
 import 'components/home_menu.dart';
 import 'components/home_stats.dart';
+import 'components/eco_tips_carousel.dart'; // ✅ Tambahkan import ini
 import '../../widgets/bottom_nav.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -41,10 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
-          children: const [
-            HomeHeader(),
-            HomeMenu(),
-            HomeStats(totalSampah: 33),
+          children: [
+            const HomeHeader(),
+            const HomeMenu(),
+            const SizedBox(height: 5),
+            const HomeStats(totalSampah: 33),
+            EcoTipsCarousel(),
           ],
         ),
       ),
