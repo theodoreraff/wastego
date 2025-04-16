@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'components/home_header.dart';
 import 'components/home_menu.dart';
 import 'components/home_stats.dart';
-import 'components/eco_tips_carousel.dart'; // ✅ Tambahkan import ini
+import 'components/eco_tips_carousel.dart';
 import '../../widgets/bottom_nav.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,26 +13,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0; // Index tab aktif
+  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // Navigasi berdasarkan index
     switch (index) {
       case 0:
         Navigator.pushNamed(context, '/home');
         break;
       case 1:
-        Navigator.pushNamed(context, '/home');
+        Navigator.pushNamed(context, '/billing');
         break;
       case 2:
-        Navigator.pushNamed(context, '/home');
+        Navigator.pushNamed(context, '/more');
         break;
       case 3:
-        Navigator.pushNamed(context, '/home');
+        Navigator.pushNamed(context, '/more');
         break;
     }
   }

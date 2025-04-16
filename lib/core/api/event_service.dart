@@ -13,7 +13,6 @@ class EventService {
         location: 'Keputih, Surabaya',
         address: '44621',
       ),
-      // Tambah event lainnya sesuai kebutuhan
     ];
   }
 }

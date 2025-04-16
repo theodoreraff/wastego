@@ -8,6 +8,7 @@ import '../views/events/events_page.dart';
 import '../views/donate/donate_screen.dart';
 import '../views/blog/blog_screen.dart';
 import '../views/tips/tips_screen.dart';
+import '../views/more/more_page.dart';
 
 class AppRoutes {
   static const String login = '/';
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String donate = '/donate';
   static const String blog = '/blog';
   static const String tips = '/tips';
+  static const String more = '/more';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -40,6 +42,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const BlogScreen());
       case tips:
         return MaterialPageRoute(builder: (_) => const TipsScreen());
+      case more:
+        return MaterialPageRoute(builder: (_) => const MoreScreen());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
