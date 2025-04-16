@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../widgets/custom_button.dart'; // Ganti path sesuai folder kamu
+import 'package:wastego/views/recycle/request_pickup_page.dart';
+import '../../widgets/custom_button.dart';
 
 class RecyclePage extends StatefulWidget {
   const RecyclePage({super.key});
@@ -115,7 +116,12 @@ class _RecyclePageState extends State<RecyclePage> {
               textColor: const Color(0xFFB8FF00),
               icon: Icons.local_shipping_outlined,
               onPressed: () {
-                // TODO: implementasi permintaan penjemputan
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RequestPickupPage(itemCounts: itemCounts),
+                  ),
+                ); // TODO: implementasi permintaan penjemputan
               },
             ),
           ],

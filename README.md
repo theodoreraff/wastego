@@ -12,13 +12,14 @@
 - Flutter & Dart
 - Firebase (Auth, Firestore, Storage)
 - Google Maps API
+- Express.js
 - REST API
 
 ## 🛠️ Getting Started
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/wastego.git
+git clone https://github.com/theodoreraff/wastego.git
 cd wastego
 
 # Install dependencies
