@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:wastego/views/recycle/request_pickup_page.dart';
+import 'package:wastego/views/recycle/info_page.dart';
 import '../../widgets/custom_button.dart';
 
 class RecyclePage extends StatefulWidget {
@@ -39,15 +40,42 @@ class _RecyclePageState extends State<RecyclePage> {
     });
   }
 
+  void showAlert(String action) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            'Tunggu dulu!',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            action == 'estimasi'
+                ? 'Yuk, tambahkan beberapa barang terlebih dahulu untuk melihat estimasi penukaran. Semakin banyak barang, semakin besar estimasi!'
+                : 'Sepertinya kamu belum menambahkan barang untuk dijemput. Ayo, pilih barang yang ingin dijemput terlebih dahulu!',
+            style: const TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Oke, Siap!'),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF003D3D),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void showEstimationSheet() {
     final totalItems = itemCounts.values.fold(0, (sum, count) => sum + count);
 
     if (totalItems == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Isi setidaknya 1 item untuk melihat estimasi.'),
-        ),
-      );
+      showAlert('estimasi');
       return;
     }
 
@@ -118,10 +146,19 @@ class _RecyclePageState extends State<RecyclePage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: const BackButton(),
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.info_outline),
+            padding: const EdgeInsets.only(right: 16),
+            child: IconButton(
+              icon: const Icon(Icons.info_outline),
+              onPressed: () {
+                // Redirect ke InfoPage saat ikon info ditekan
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const InfoPage()),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -185,6 +222,14 @@ class _RecyclePageState extends State<RecyclePage> {
               textColor: const Color(0xFFB8FF00),
               icon: Icons.local_shipping_outlined,
               onPressed: () {
+                final totalItems = itemCounts.values.fold(
+                  0,
+                  (sum, count) => sum + count,
+                );
+                if (totalItems == 0) {
+                  showAlert('penjemputan');
+                  return;
+                }
                 Navigator.push(
                   context,
                   MaterialPageRoute(
