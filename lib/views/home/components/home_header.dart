@@ -89,7 +89,9 @@ class HomeHeader extends StatelessWidget {
                     children: [
                       IconButton(
                         icon: const Icon(LucideIcons.bell),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, AppRoutes.notification);
+                        },
                       ),
                       const SizedBox(width: 8),
                       GestureDetector(
