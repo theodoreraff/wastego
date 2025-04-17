@@ -47,8 +47,8 @@ class BottomNavBar extends StatelessWidget {
             elevation: 0,
             items: [
               _buildNavItem(LucideIcons.home, "Beranda", currentIndex, 0),
-              _buildNavItem(LucideIcons.headphones, "Bantuan", currentIndex, 1),
-              _buildNavItem(LucideIcons.receipt, "Billing", currentIndex, 2),
+              _buildNavItem(LucideIcons.headphones, "Support", currentIndex, 1),
+              _buildNavItem(LucideIcons.receipt, "Poin", currentIndex, 2),
               _buildNavItem(
                 LucideIcons.moreHorizontal,
                 "More",
