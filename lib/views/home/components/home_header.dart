@@ -1,14 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../routes/app_routes.dart';
 
 class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key});
+  final String userName;
+  final int points;
+  final String userId;
+
+  const HomeHeader({
+    super.key,
+    required this.userName,
+    required this.points,
+    required this.userId,
+  });
+
+  // Greeting Function
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 4 && hour < 11) {
+      return 'Selamat Pagi';
+    } else if (hour >= 11 && hour < 15) {
+      return 'Selamat Siang';
+    } else if (hour >= 15 && hour < 18) {
+      return 'Selamat Sore';
+    } else {
+      return 'Selamat Malam';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -62,7 +84,7 @@ class HomeHeader extends StatelessWidget {
                     ],
                   ),
 
-                  // Notifikasi & Avatar
+                  // Avatar & Notification
                   Row(
                     children: [
                       IconButton(
@@ -70,19 +92,24 @@ class HomeHeader extends StatelessWidget {
                         onPressed: () {},
                       ),
                       const SizedBox(width: 8),
-                      ClipOval(
-                        child: Image.asset(
-                          'assets/images/profile.png',
-                          width: 32,
-                          height: 32,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.person,
-                              size: 32,
-                              color: Colors.grey,
-                            );
-                          },
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.profile);
+                        },
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/profile.png',
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.person,
+                                size: 32,
+                                color: Colors.grey,
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -105,7 +132,7 @@ class HomeHeader extends StatelessWidget {
                   height: 168,
                   child: Stack(
                     children: [
-                      // Background SVG full width
+                      // Background SVG
                       Positioned.fill(
                         child: SvgPicture.asset(
                           'assets/images/banner.svg',
@@ -114,32 +141,32 @@ class HomeHeader extends StatelessWidget {
                         ),
                       ),
 
-                      // Text Content
-                      const Positioned(
+                      // Greeting & user info
+                      Positioned(
                         left: 16,
                         top: 24,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Selamat Pagi, John',
-                              style: TextStyle(
+                              '${_getGreeting()}, $userName',
+                              style: const TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
-                              'Poin: 500 Eco',
-                              style: TextStyle(
+                              'Poin: $points Eco',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.white,
                               ),
                             ),
                             Text(
-                              'ID: WGO-001234',
-                              style: TextStyle(
+                              'ID: $userId',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.white,
                               ),
