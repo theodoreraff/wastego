@@ -9,6 +9,7 @@ import '../views/donate/donate_screen.dart';
 import '../views/blog/blog_screen.dart';
 import '../views/tips/tips_screen.dart';
 import '../views/more/more_page.dart';
+import '../views/settings/profile_page.dart';
 
 class AppRoutes {
   static const String login = '/';
@@ -21,6 +22,7 @@ class AppRoutes {
   static const String blog = '/blog';
   static const String tips = '/tips';
   static const String more = '/more';
+  static const String profile = 'profile_page.dart';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -44,6 +46,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const TipsScreen());
       case more:
         return MaterialPageRoute(builder: (_) => const MoreScreen());
+      case profile:
+        return MaterialPageRoute(builder: (_) => const ProfilePage());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
