@@ -12,8 +12,12 @@ class CustomButton extends StatelessWidget {
     Key? key,
     required this.text,
     this.onPressed,
-    this.backgroundColor = const Color(0xFF003539),
-    this.textColor = const Color(0xFFAFEE00),
+    this.backgroundColor = const Color(
+      0xFF003539,
+    ), // Default color (Greenish tone)
+    this.textColor = const Color(
+      0xFFAFEE00,
+    ), // Default text color (Light Green)
     this.icon,
     this.isLoading = false,
   }) : super(key: key);
@@ -31,7 +35,14 @@ class CustomButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 0,
+          elevation: 4, // Slight shadow for better focus
+          padding: const EdgeInsets.symmetric(
+            vertical: 14,
+          ), // Padding for a clean look
+          side: BorderSide(
+            color: isDisabled ? Colors.grey : backgroundColor,
+            width: 1.5, // Border color adjustment
+          ),
         ),
         onPressed: isDisabled ? null : onPressed,
         child:
@@ -49,7 +60,7 @@ class CustomButton extends StatelessWidget {
                       style: TextStyle(
                         color: textColor,
                         fontSize: 16,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.bold, // Bolder text for emphasis
                       ),
                     ),
                     if (icon != null) ...[
