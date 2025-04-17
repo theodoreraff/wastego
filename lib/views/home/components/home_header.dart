@@ -50,10 +50,10 @@ class HomeHeader extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        width: 40,
-                        height: 32,
-                        child: Image.asset(
-                          'assets/images/logo.png',
+                        width: 50,
+                        height: 38,
+                        child: SvgPicture.asset(
+                          'assets/images/logo.svg',
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {
                             return const Icon(
@@ -64,19 +64,22 @@ class HomeHeader extends StatelessWidget {
                           },
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       RichText(
-                        text: const TextSpan(
+                        text: TextSpan(
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w800,
                             color: Colors.black,
                           ),
                           children: [
-                            TextSpan(text: 'Waste'),
+                            TextSpan(
+                              text: 'Waste',
+                              style: TextStyle(color: Color(0xFF003539)),
+                            ),
                             TextSpan(
                               text: 'Go',
-                              style: TextStyle(color: Color(0xFF8BC34A)),
+                              style: TextStyle(color: Color(0xFFAFEE00)),
                             ),
                           ],
                         ),
