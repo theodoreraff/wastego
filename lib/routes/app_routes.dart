@@ -10,6 +10,9 @@ import '../views/blog/blog_screen.dart';
 import '../views/tips/tips_screen.dart';
 import '../views/more/more_page.dart';
 import '../views/settings/profile_page.dart';
+import '../views/notification/notification_page.dart';
+import '../views/support/help_page.dart';
+import '../views/poin/poin_page.dart';
 
 class AppRoutes {
   static const String login = '/';
@@ -23,6 +26,9 @@ class AppRoutes {
   static const String tips = '/tips';
   static const String more = '/more';
   static const String profile = 'profile_page.dart';
+  static const String notification = '/notification';
+  static const String help = '/help';
+  static const String points = '/points';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -48,6 +54,12 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const MoreScreen());
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfilePage());
+      case notification:
+        return MaterialPageRoute(builder: (_) => const NotificationsPage());
+      case help:
+        return MaterialPageRoute(builder: (_) => const HelpPage());
+      case points:
+        return MaterialPageRoute(builder: (_) => const PointsPage());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
