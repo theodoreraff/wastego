@@ -16,8 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   // Simulasi data user
-  final String _userName = 'Theo';
-  final int _points = 400;
+  final String _userName = 'User';
+  final int _points = 500;
   final String _userId = 'WGO-001234';
 
   void _onItemTapped(int index) {
@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
             HomeHeader(userName: _userName, points: _points, userId: _userId),
             const HomeMenu(),
             const SizedBox(height: 5),
-            const HomeStats(totalSampah: 33),
+            const HomeStats(totalSampah: 155),
             EcoTipsCarousel(),
           ],
         ),

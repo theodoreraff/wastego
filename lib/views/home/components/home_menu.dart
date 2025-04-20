@@ -40,7 +40,12 @@ class HomeMenu extends StatelessWidget {
       },
     ];
 
+    // Get screen width to adjust font size dynamically
     double screenWidth = MediaQuery.of(context).size.width;
+
+    // Calculate font sizes based on screen width
+    double labelFontSize = screenWidth * 0.04;
+    double iconSize = screenWidth * 0.07;
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -86,12 +91,12 @@ class HomeMenu extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(item["icon"], size: 28, color: item["color"]),
+                    Icon(item["icon"], size: iconSize, color: item["color"]),
                     const SizedBox(height: 6),
                     Text(
                       item["label"],
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: labelFontSize,
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
                       ),

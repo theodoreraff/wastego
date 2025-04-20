@@ -31,6 +31,14 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen width and height
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    double greetingFontSize = screenWidth * 0.05;
+    double pointsFontSize = screenWidth * 0.03;
+    double userInfoFontSize = screenWidth * 0.03;
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -50,8 +58,8 @@ class HomeHeader extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        width: 50,
-                        height: 38,
+                        width: screenWidth * 0.12,
+                        height: screenWidth * 0.09,
                         child: SvgPicture.asset(
                           'assets/images/logo.svg',
                           fit: BoxFit.contain,
@@ -68,7 +76,9 @@ class HomeHeader extends StatelessWidget {
                       RichText(
                         text: TextSpan(
                           style: TextStyle(
-                            fontSize: 25,
+                            fontSize:
+                                screenWidth *
+                                0.045, // Adjusted font size for title
                             fontWeight: FontWeight.w800,
                             color: Colors.black,
                           ),
@@ -104,8 +114,8 @@ class HomeHeader extends StatelessWidget {
                         child: ClipOval(
                           child: Image.asset(
                             'assets/images/profile.png',
-                            width: 32,
-                            height: 32,
+                            width: screenWidth * 0.08, // Adjusted avatar size
+                            height: screenWidth * 0.08,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return const Icon(
@@ -134,7 +144,7 @@ class HomeHeader extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 child: SizedBox(
                   width: double.infinity,
-                  height: 168,
+                  height: screenHeight * 0.18, // Reduced height for banner
                   child: Stack(
                     children: [
                       // Background SVG
@@ -149,30 +159,30 @@ class HomeHeader extends StatelessWidget {
                       // Greeting & user info
                       Positioned(
                         left: 16,
-                        top: 24,
+                        top: 16, // Adjusted top padding
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               '${_getGreeting()}, $userName',
-                              style: const TextStyle(
-                                fontSize: 30,
+                              style: TextStyle(
+                                fontSize: greetingFontSize,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 4), // Reduced space
                             Text(
                               'Poin: $points Eco',
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: TextStyle(
+                                fontSize: pointsFontSize,
                                 color: Colors.white,
                               ),
                             ),
                             Text(
                               'ID: $userId',
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: TextStyle(
+                                fontSize: userInfoFontSize,
                                 color: Colors.white,
                               ),
                             ),

@@ -7,6 +7,13 @@ class HomeStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    double titleFontSize = screenWidth * 0.05;
+    double subtitleFontSize = screenWidth * 0.035;
+    double totalSampahFontSize = screenWidth * 0.06;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
@@ -24,18 +31,21 @@ class HomeStats extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "#buangjadiuang",
               style: TextStyle(
-                fontSize: 25,
+                fontSize: titleFontSize, // Smaller title font size
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               "Terima kasih telah membuat dunia lebih hijau!",
-              style: TextStyle(fontSize: 20, color: Colors.white),
+              style: TextStyle(
+                fontSize: subtitleFontSize, // Smaller subtitle font size
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 20),
             Row(
@@ -48,7 +58,7 @@ class HomeStats extends StatelessWidget {
                     Text(
                       "Total Sampah kamu",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14, // Static smaller font size for label
                         fontWeight: FontWeight.w500,
                         color: Colors.white,
                       ),
@@ -57,8 +67,9 @@ class HomeStats extends StatelessWidget {
                 ),
                 Text(
                   totalSampah.toString(),
-                  style: const TextStyle(
-                    fontSize: 32,
+                  style: TextStyle(
+                    fontSize:
+                        totalSampahFontSize, // Smaller font size for totalSampah
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
