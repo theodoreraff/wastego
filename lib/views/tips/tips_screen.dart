@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:wastego/core/models/tips_model.dart';
 import 'package:wastego/views/tips/detail_tips_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:wastego/views/tips/menu_tips_screen.dart';
+import 'package:wastego/widgets/custom_button.dart';
 
 class TipsScreen extends StatelessWidget {
   const TipsScreen({super.key});
-
-  _sendMails(String mail) async {
-    final Uri kaunchUri = Uri(scheme: 'mailto', path: mail);
-    if (await canLaunchUrl(kaunchUri)) {
-      await launchUrl(kaunchUri);
-    } else {
-      debugPrint('Tidak bisa membuka Email App.');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,16 +14,15 @@ class TipsScreen extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        elevation: 0,
         title: Row(
           children: [
             GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
               child: const Icon(Icons.chevron_left, size: 24),
             ),
             const SizedBox(width: 5),
-            Text(
+            const Text(
               "Tips",
               style: TextStyle(
                 fontSize: 18,
@@ -49,188 +39,159 @@ class TipsScreen extends StatelessWidget {
           itemCount: tipsList.length + 2,
           itemBuilder: (context, index) {
             if (index == 0) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Image.asset(
-                          'assets/images/undraw_nature.png',
-                          height: 120,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Helpful tips, courtesy of',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                                color: const Color.fromARGB(255, 32, 170, 36),
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Dr. Adam Smith, Ph.D.',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Environmental Engineer & Sustainability Consultant',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            GestureDetector(
-                              onTap: () {
-                                _sendMails('Adam.Smith@gmail.com');
-                              },
-                              child: Text(
-                                'Adam.Smith@gmail.com',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.green,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              );
-            } else if (index <= 5) {
+              return _headerSection(context);
+            } else if (index <= tipsList.length) {
               final Tips tips = tipsList[index - 1];
               return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailTipsScreen(tipsItem: tips),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailTipsScreen(tipsItem: tips),
+                      ),
                     ),
-                  );
-                },
-                child: listItem(tips),
+                child: _tipsItem(tips),
               );
-            } else if (index == 6) {
+            } else if (index == tipsList.length + 1) {
               return Column(
                 children: [
                   const SizedBox(height: 20),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MenuTipsScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFAFEE00),
-                        foregroundColor: Color(0xFF003539),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                  CustomButton(
+                    text: 'Lebih Banyak',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MenuTipsScreen(),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Lebih Banyak',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
+                      );
+                    },
+                    backgroundColor: const Color(0xFFAFEE00),
+                    textColor: const Color(0xFF003539),
                   ),
                   const SizedBox(height: 30),
                 ],
               );
             } else {
-              return Container();
+              return const SizedBox.shrink();
             }
           },
         ),
       ),
     );
   }
-}
 
-Widget listItem(Tips tipsItem) {
-  return Card(
-    color: Colors.white,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-    elevation: 2,
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _headerSection(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset(tipsItem.imageAsset),
-            ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(60.0),
+          child: Image.asset(
+            'assets/images/adam.jpeg',
+            height: 100,
+            width: 100,
+            fit: BoxFit.cover,
           ),
         ),
+        const SizedBox(width: 15),
         Expanded(
-          flex: 2,
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: 12.0,
-              bottom: 12.0,
-              right: 12.0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  tipsItem.title,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Ready to make the world greener?',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF32A824),
                 ),
-                const SizedBox(height: 8.0),
-                Text(
-                  tipsItem.titleDescription,
-                  style: const TextStyle(
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Here are expert tips from Dr. Adam Smith!',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF003539),
+                ),
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'Environmental Expert and Sustainability Advocate',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400),
+              ),
+              const SizedBox(height: 2),
+              GestureDetector(
+                child: const Text(
+                  'Reach Out: adam.smith@gmail.com',
+                  style: TextStyle(
                     fontSize: 10,
-                    fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
+                    color: Color(0xFF32A824),
+                    decoration: TextDecoration.underline,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
-    ),
-  );
+    );
+  }
+
+  Widget _tipsItem(Tips tipsItem) {
+    return Card(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.asset(tipsItem.imageAsset),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 12.0,
+                bottom: 12.0,
+                right: 12.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tipsItem.title,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    tipsItem.titleDescription,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
