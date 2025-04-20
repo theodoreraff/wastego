@@ -15,6 +15,7 @@ class _RegisterFormState extends State<RegisterForm> {
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
   bool _agreeToTerms = false;
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -24,7 +25,7 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  void _handleRegister() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
@@ -36,8 +37,22 @@ class _RegisterFormState extends State<RegisterForm> {
       return;
     }
 
-    // TODO: Integrasikan ke AuthService
-    print('Registering $email');
+    setState(() => isLoading = true);
+
+    try {
+      // TODO: Ganti dengan API request nyata ke backend kalian
+      await Future.delayed(const Duration(seconds: 2));
+      debugPrint('Registering $email');
+
+      // Setelah sukses, redirect ke halaman home
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Registrasi gagal: $e')));
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -139,7 +154,8 @@ class _RegisterFormState extends State<RegisterForm> {
         const SizedBox(height: 5),
         CustomButton(
           text: 'Daftar',
-          onPressed: _agreeToTerms ? _handleRegister : null,
+          isLoading: isLoading,
+          onPressed: _agreeToTerms && !isLoading ? _handleRegister : null,
         ),
       ],
     );

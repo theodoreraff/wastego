@@ -60,6 +60,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HelpPage());
       case points:
         return MaterialPageRoute(builder: (_) => const PointsPage());
+
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
