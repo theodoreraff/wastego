@@ -16,91 +16,95 @@ class Tips {
 
 var tipsList = [
   Tips(
-    title: 'Waste Reduction Tips',
+    title: 'Tips Pengurangan Limbah',
     titleDescription:
-        'Reduce waste by transforming your unused items into practical solutions with these tips.',
+        'Kurangi sampah dengan mengubah barang yang tidak terpakai menjadi solusi praktis, ikuti tips mudah ini!',
     description: '''
-Limbah adalah sisa hasil dari suatu kegiatan atau proses produksi, baik yang berasal dari aktivitas rumah tangga, industri, pertanian, maupun kegiatan lainnya, yang sudah tidak digunakan lagi dan dibuang. Limbah bisa berbentuk padat, cair, atau gas, dan dapat bersifat organik (mudah terurai) maupun anorganik (sulit terurai).
-Mengurangi limbah penting untuk menjaga lingkungan dan mengurangi polusi. Dalam kehidupan sehari-hari, kita bisa mulai mengurangi limbah dengan cara yang sederhana seperti mengurangi konsumsi plastik sekali pakai dan mendaur ulang barang-barang yang bisa digunakan kembali.
+Sampah adalah sisa dari aktivitas atau proses produksi, baik yang berasal dari rumah tangga, industri, pertanian, atau kegiatan lainnya. Sampah bisa berupa padat, cair, atau gas, dan dapat bersifat organik (mudah terurai) maupun anorganik (sulit terurai).
+Pengurangan sampah sangat penting untuk menjaga kebersihan lingkungan dan mencegah polusi. Cobalah untuk memulai dengan langkah sederhana di rumah, seperti mengurangi konsumsi plastik sekali pakai dan mendaur ulang barang yang masih bisa digunakan kembali. 
+Dapatkan cara mudah dan efektif untuk mulai mengurangi sampah di kehidupan sehari-hari!
 ''',
     steps: '''
-Langkah-langkah mengurangi limbah:
+Langkah-langkah mengurangi sampah:
 1. Identifikasi barang yang jarang digunakan di rumah.
-2. Gunakan kembali kemasan bekas seperti botol atau toples.
-3. Beli produk dengan sedikit kemasan atau tanpa kemasan.
-4. Gunakan tas belanja kain daripada kantong plastik.
-5. Hindari barang sekali pakai jika memungkinkan.
+2. Gunakan kembali kemasan bekas seperti botol atau toples untuk kebutuhan lainnya.
+3. Pilih produk dengan sedikit kemasan atau tanpa kemasan.
+4. Gunakan tas belanja kain untuk menggantikan kantong plastik.
+5. Hindari penggunaan barang sekali pakai yang hanya menghasilkan sampah.
 ''',
-    imageAsset: 'assets/images/waste_reduction_tips_thumbnail.png',
+    imageAsset: 'assets/images/reduction.jpg',
   ),
   Tips(
-    title: 'Recycling Tips',
+    title: 'Tips Daur Ulang yang Efektif',
     titleDescription:
-        'Make your own produce bags to reduce single-use plastic waste.',
+        'Ubah kebiasaanmu dan daur ulang dengan cara yang benar untuk lingkungan yang lebih bersih!',
     description: '''
-Daur ulang adalah proses mengubah material bekas menjadi produk baru yang dapat digunakan kembali. Daur ulang tidak hanya mengurangi sampah, tetapi juga membantu menghemat sumber daya alam. Berikut ini beberapa tips yang dapat Anda terapkan untuk mendaur ulang dengan efektif.
-Daur ulang yang tepat akan mengurangi sampah yang masuk ke tempat pembuangan akhir dan mengurangi dampak negatif terhadap lingkungan.
+Daur ulang adalah cara cerdas untuk mengubah material bekas menjadi produk baru yang bisa digunakan lagi. Dengan mendaur ulang, kita tidak hanya mengurangi sampah, tetapi juga membantu menghemat sumber daya alam.
+Penerapan daur ulang yang tepat akan mengurangi volume sampah di tempat pembuangan akhir dan mengurangi dampak negatif terhadap bumi. 
+Mari daur ulang dengan cara yang benar dan jadilah bagian dari solusi global untuk lingkungan yang lebih hijau.
 ''',
     steps: '''
 Langkah-langkah mendaur ulang dengan efektif:
-1. Pisahkan sampah organik dan anorganik di rumah.
-2. Bilas kemasan plastik/kaleng sebelum dibuang.
-3. Gunakan tempat sampah berbeda untuk kertas, plastik, dan kaca.
-4. Cek simbol daur ulang di produk.
-5. Gunakan ulang botol atau kaleng untuk keperluan lain.
+1. Pisahkan sampah organik dan anorganik dengan mudah di rumah.
+2. Pastikan kemasan plastik atau kaleng dibersihkan sebelum dibuang.
+3. Gunakan tempat sampah yang terpisah untuk kertas, plastik, dan kaca.
+4. Periksa simbol daur ulang pada produk kemasan.
+5. Gunakan kembali botol atau kaleng untuk keperluan kreatif lainnya.
 ''',
     imageAsset: 'assets/images/recycling_tips.png',
   ),
   Tips(
-    title: 'Composting Tips',
+    title: 'Tips Komposting: Manfaatkan Sisa Makanan untuk Kebunmu',
     titleDescription:
-        'Turn food scraps into nutrient-rich compost for your garden.',
+        'Ubah sampah makanan menjadi kompos kaya nutrisi untuk kebun yang subur.',
     description: '''
-Komposting adalah proses alami di mana bahan organik seperti sisa makanan diubah menjadi kompos yang dapat digunakan sebagai pupuk untuk tanaman. Proses ini tidak hanya mengurangi sampah, tetapi juga memberikan manfaat lingkungan dan mengurangi penggunaan pupuk kimia.
-Komposting bisa dilakukan di rumah dengan menggunakan tempat kompos yang sederhana.
+Komposting adalah proses alami yang mengubah sisa makanan menjadi kompos yang dapat digunakan sebagai pupuk organik untuk tanaman. Dengan komposting, kamu tidak hanya mengurangi sampah, tetapi juga berkontribusi pada keberlanjutan lingkungan.
+Mulailah mengkompos di rumah dan nikmati hasilnya untuk kebunmu yang lebih hijau dan sehat.
 ''',
     steps: '''
 Langkah membuat kompos dari sisa makanan:
-1. Siapkan tempat kompos atau pot besar dengan lubang udara.
-2. Masukkan sisa sayur, buah, dan daun kering.
-3. Aduk kompos setiap 2–3 hari agar proses lancar.
-4. Jaga kelembaban dengan menambahkan sedikit air.
-5. Kompos siap dalam 1–2 bulan dan bisa digunakan sebagai pupuk alami.
+1. Siapkan tempat kompos dengan ventilasi yang baik.
+2. Masukkan sisa sayur, buah, dan daun kering ke dalam tempat kompos.
+3. Aduk kompos setiap 2–3 hari agar proses fermentasi berjalan dengan lancar.
+4. Jaga kelembaban kompos dengan menambahkan sedikit air jika perlu.
+5. Kompos siap dalam 1–2 bulan dan dapat digunakan sebagai pupuk alami yang ramah lingkungan.
 ''',
     imageAsset: 'assets/images/composting_tips.png',
   ),
   Tips(
-    title: 'Reusing and Upcycling Tips',
+    title: 'Tips Reuse dan Upcycling: Hidupkan Kembali Barang Lama',
     titleDescription:
-        'Upcycling tips that turn the ordinary into the extraordinary.',
+        'Jangan buang barang lama! Gunakan kreativitasmu untuk mengubahnya menjadi sesuatu yang berguna.',
     description: '''
-Reusing dan upcycling adalah dua cara yang efektif untuk mengurangi limbah dan memberikan barang lama kehidupan baru. Upcycling mengubah barang-barang yang tidak terpakai menjadi sesuatu yang berguna dan kreatif.
-Contohnya, Anda dapat mengubah pakaian lama menjadi tas atau membuat furnitur lama menjadi lebih modern.
+Reusing dan upcycling adalah cara pintar untuk mengurangi sampah dan memberi kehidupan baru pada barang-barang yang tidak terpakai. Dengan sedikit kreativitas, kita bisa mengubah barang lama menjadi sesuatu yang berguna dan bahkan bernilai tinggi.
+Misalnya, mengubah pakaian lama menjadi tas atau furnitur bekas menjadi lebih modern dan berguna.
+Ayo, berkreasi dan buktikan kalau sampah bisa menjadi barang yang penuh nilai dan kegunaan!
 ''',
     steps: '''
 Langkah-langkah untuk reuse dan upcycle:
-1. Gunakan kembali wadah bekas untuk menyimpan alat kecil.
-2. Ubah baju lama menjadi tas belanja.
-3. Cat ulang atau modifikasi furnitur lama agar terlihat baru.
-4. Gunakan koran bekas sebagai pembungkus kado.
-5. Kreasikan kerajinan tangan dari bahan bekas.
+1. Gunakan kembali wadah bekas untuk menyimpan alat kecil atau barang lainnya.
+2. Ubah baju lama menjadi tas belanja yang keren.
+3. Cat ulang atau modifikasi furnitur lama agar tampil lebih modern.
+4. Gunakan koran bekas sebagai pembungkus kado untuk menambah kesan unik.
+5. Kreasikan kerajinan tangan dari bahan-bahan bekas yang bisa dipakai kembali.
 ''',
     imageAsset: 'assets/images/reusing_and_upcycling_tips.png',
   ),
   Tips(
-    title: 'Waste Management Awareness Tips',
+    title: 'Tips Kesadaran Pengelolaan Sampah',
     titleDescription:
-        'Tips about awareness and ideas with regards to waste management process',
+        'Pentingnya kesadaran pengelolaan sampah untuk masa depan yang lebih hijau.',
     description: '''
-Meningkatkan kesadaran tentang pengelolaan sampah sangat penting untuk menciptakan lingkungan yang lebih bersih dan lebih hijau. Pengelolaan sampah yang baik membantu mengurangi pencemaran dan meningkatkan kualitas hidup.
+Meningkatkan kesadaran tentang pengelolaan sampah adalah langkah pertama yang sangat penting untuk menciptakan lingkungan yang lebih bersih dan hijau. Pengelolaan sampah yang baik tidak hanya mengurangi polusi, tetapi juga membantu menjaga keseimbangan alam.
+Mari tingkatkan kesadaran kita bersama untuk menjaga bumi lebih bersih dan sehat.
 ''',
     steps: '''
-Langkah meningkatkan kesadaran tentang pengelolaan sampah:
-1. Edukasi diri sendiri dan keluarga tentang jenis-jenis sampah.
+Langkah-langkah meningkatkan kesadaran tentang pengelolaan sampah:
+1. Edukasi diri sendiri dan keluarga tentang jenis-jenis sampah yang ada.
 2. Ikut serta dalam program daur ulang di lingkungan sekitar.
-3. Kurangi pembelian barang yang tidak perlu.
-4. Dukung produk ramah lingkungan.
-5. Bagikan pengetahuan ini melalui media sosial atau kegiatan masyarakat.
+3. Kurangi pembelian barang yang tidak perlu dan lebih bijak dalam konsumsi.
+4. Dukung produk ramah lingkungan yang mendukung keberlanjutan.
+5. Bagikan pengetahuan tentang pengelolaan sampah kepada orang lain melalui media sosial atau kegiatan komunitas.
 ''',
     imageAsset: 'assets/images/waste_management_awareness_tips.png',
   ),
