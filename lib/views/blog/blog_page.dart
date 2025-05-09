@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:wastego/core/models/blog_model.dart';
-import 'package:wastego/views/blog/detail_blog_screen.dart';
+import 'package:wastego/views/blog/detail_blog.dart';
+import 'package:wastego/views/blog/menu_blog.dart';
 
-class MenuBlogScreen extends StatelessWidget {
-  const MenuBlogScreen({super.key});
+class BlogPage extends StatelessWidget {
+  const BlogPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class MenuBlogScreen extends StatelessWidget {
             ),
             const SizedBox(width: 5),
             const Text(
-              "Menu Blog",
+              "Blog",
               style: TextStyle(
                 fontSize: 18,
                 fontFamily: 'Poppins',
@@ -35,20 +36,63 @@ class MenuBlogScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView.builder(
-          itemCount: blogList.length,
+          itemCount: blogList.length + 2,
           itemBuilder: (context, index) {
-            final Blog blog = blogList[index];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailBlogScreen(blogItem: blog),
+            if (index <= 5) {
+              final Blog blog = blogList[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailBlogScreen(blogItem: blog),
+                    ),
+                  );
+                },
+                child: listItem(blog),
+              );
+            } else if (index == 6) {
+              return Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MenuBlogScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFAFEE00),
+                        foregroundColor: const Color(0xFF003539),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Lebih Banyak',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
                   ),
-                );
-              },
-              child: listItem(blog),
-            );
+                  const SizedBox(height: 30),
+                ],
+              );
+            } else {
+              return Container();
+            }
           },
         ),
       ),

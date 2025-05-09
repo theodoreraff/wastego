@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'components/login_form.dart';
 import 'components/auth_tab_switcher.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {

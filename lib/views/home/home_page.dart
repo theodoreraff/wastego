@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
-import 'components/home_header.dart';
-import 'components/home_menu.dart';
+
+import 'components/home_top_section.dart';
 import 'components/home_stats.dart';
 import 'components/eco_tips_carousel.dart';
 import '../../widgets/bottom_nav.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+/// Displays user info, menu shortcuts, stats, and eco tips.
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // Simulasi data user
-  final String _userName = 'User';
-  final int _points = 500;
+  // Simulated user data (to be replaced with real data from backend/API)
+  final String _userName = 'WasteHero';
+  final int _points = 145000;
   final String _userId = 'WGO-001234';
 
+  /// Handles navigation between tabs.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -34,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case 2:
         Navigator.pushNamed(context, '/points');
+        break;
       case 3:
         Navigator.pushNamed(context, '/more');
         break;
@@ -46,14 +49,25 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HomeHeader(userName: _userName, points: _points, userId: _userId),
-            const HomeMenu(),
+            // Combined header + menu
+            HomeTopSection(
+              userName: _userName,
+              points: _points,
+              userId: _userId,
+            ),
+
             const SizedBox(height: 5),
+
+            // Waste stats
             const HomeStats(totalSampah: 155),
-            EcoTipsCarousel(),
+
+            // Carousel of eco tips
+            const EcoTipsCarousel(),
           ],
         ),
       ),
+
+      // Custom bottom navigation bar
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../../widgets/custom_button.dart';
 
 class LoginForm extends StatefulWidget {
@@ -20,10 +21,17 @@ class _LoginFormState extends State<LoginForm> {
     Future.delayed(const Duration(seconds: 2), () {
       setState(() => isLoading = false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Login Berhasil!")));
+      Fluttertoast.showToast(
+        msg: "Login Berhasil!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
 
+      // Optionally, add a little animation to make it more fun!
       Future.delayed(const Duration(milliseconds: 200), () {
         Navigator.pushReplacementNamed(context, '/home');
       });

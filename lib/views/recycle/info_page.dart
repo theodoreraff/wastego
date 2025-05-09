@@ -8,8 +8,7 @@ class InfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daur Ulang: Menyelamatkan Bumi'),
-        backgroundColor: const Color(0xFF003D3D),
+        title: const Text('Daur Ulang'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),

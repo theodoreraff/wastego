@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:wastego/core/models/donate_model.dart';
-import 'package:wastego/views/donate/detail_donate_screen.dart';
+import 'package:wastego/views/donate/detail_donate.dart';
 
-class DonateScreen extends StatefulWidget {
-  const DonateScreen({super.key});
+class DonatePage extends StatefulWidget {
+  const DonatePage({super.key});
 
   @override
-  State<DonateScreen> createState() => _DonateScreenState();
+  State<DonatePage> createState() => _DonatePageState();
 }
 
-class _DonateScreenState extends State<DonateScreen> {
+class _DonatePageState extends State<DonatePage> {
   String selectedStatus = 'Ongoing';
 
   @override

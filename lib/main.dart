@@ -7,6 +7,7 @@ import 'package:wastego/routes/app_routes.dart';
 import 'package:wastego/core/providers/auth_provider.dart';
 import 'package:wastego/core/providers/schedule_provider.dart';
 import 'package:wastego/core/providers/event_provider.dart';
+import 'package:wastego/core/providers/notification_provider.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -24,6 +25,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ScheduleProvider()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: const MyApp(),
     ),
@@ -37,11 +39,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.onboarding,
       onGenerateRoute: AppRoutes.generateRoute,
-
-      // Theme Global
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../coming_soon_page.dart';
 import './setting_tile.dart';
+import './notification_settings_page.dart';
+import './faq_page.dart';
+import './about_page.dart';
 
 class SettingList extends StatelessWidget {
   const SettingList({super.key});
@@ -9,65 +12,57 @@ class SettingList extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = [
       {
-        'title': 'Pengaturan Privasi',
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
-          );
-        },
-      },
-      {
         'title': 'Pengaturan Notifikasi',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
+            MaterialPageRoute(builder: (context) => const NotificationSettingsPage()),
           );
         },
       },
+      // {
+      //   'title': 'Metode Pembayaran',
+      //   'onTap': () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
+      //     );
+      //   },
+      // },
+      // {
+      //   'title': 'Pengaturan Bahasa',
+      //   'onTap': () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const FAQPage()),
+      //     );
+      //   },
+      // },
       {
-        'title': 'Metode Pembayaran',
+        'title': 'Frequently Asked Question',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
+            MaterialPageRoute(builder: (context) => const FAQPage()),
           );
         },
       },
+      // Optional: Aktifkan jika diperlukan
+      // {
+      //   'title': 'FAQs',
+      //   'onTap': () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
+      //     );
+      //   },
+      // },
       {
-        'title': 'Pengaturan Bahasa',
+        'title': 'Tentang Aplikasi',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
-          );
-        },
-      },
-      {
-        'title': 'Pengaturan Data',
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
-          );
-        },
-      },
-      {
-        'title': 'Informasi Hukum',
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
-          );
-        },
-      },
-      {
-        'title': 'FAQs',
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
+            MaterialPageRoute(builder: (context) => AboutWasteGoPage()),
           );
         },
       },
@@ -76,7 +71,7 @@ class SettingList extends StatelessWidget {
     return Column(
       children: [
         ...settings.map(
-          (item) => SettingTile(
+              (item) => SettingTile(
             title: item['title'] as String,
             onTap: item['onTap'] as VoidCallback,
           ),

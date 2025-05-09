@@ -19,7 +19,7 @@ dependencies:
   shimmer: ^3.0.0
   firebase_messaging: ^15.2.4
   firebase_core: ^3.12.1
-  intl: ^0.20.2
+  intl: ^0.19.0
   lucide_icons: ^0.257.0
   image_picker: any
   url_launcher: ^6.3.1
@@ -28,6 +28,10 @@ dependencies:
   smooth_page_indicator: ^1.2.1
   google_fonts: ^6.2.1
   flutter_launcher_icons: ^0.14.3
+  fluttertoast: ^8.2.12
+  flutter_localization: ^0.3.2
+  share_plus: ^11.0.0
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -45,9 +49,14 @@ flutter:
     - assets/images/logotext.png
     - assets/images/
     - assets/icons/
+    - assets/images/reuse.svg
+    - assets/images/reduce.svg
+    - assets/images/recycle.svg
+    - assets/animation/success.json
 
 flutter_icons:
   android: true
   ios: true
   image_path: "assets/images/logo.png"
-  android_icon_size: 96 
+  android_icon_size: 100
+

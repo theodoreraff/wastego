@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'components/auth_tab_switcher.dart';
 import 'components/register_form.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class RegisterPage extends StatelessWidget {
+  const RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {

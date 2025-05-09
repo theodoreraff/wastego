@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wastego/core/models/tips_model.dart';
-import 'package:wastego/views/tips/detail_tips_screen.dart';
+import 'package:wastego/views/tips/detail_tips.dart';
 
 class MenuTipsScreen extends StatelessWidget {
   const MenuTipsScreen({super.key});

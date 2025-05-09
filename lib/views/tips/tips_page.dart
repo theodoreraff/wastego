@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:wastego/core/models/tips_model.dart';
-import 'package:wastego/views/tips/detail_tips_screen.dart';
-import 'package:wastego/views/tips/menu_tips_screen.dart';
+import 'package:wastego/views/tips/detail_tips.dart';
+import 'package:wastego/views/tips/menu_tips.dart';
 import 'package:wastego/widgets/custom_button.dart';
 
-class TipsScreen extends StatelessWidget {
-  const TipsScreen({super.key});
+class TipsPage extends StatelessWidget {
+  const TipsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

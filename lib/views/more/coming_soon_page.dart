@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../widgets/custom_button.dart'; // Pastikan path impor CustomButton sesuai
+import '../../widgets/custom_button.dart';
 
 class ComingSoonScreen extends StatelessWidget {
   const ComingSoonScreen({super.key});
@@ -20,8 +20,8 @@ class ComingSoonScreen extends StatelessWidget {
             colors: [
               Color(
                 0xFF2A9D8F,
-              ), // Hijau toska untuk mencerminkan tema lingkungan
-              Color(0xFF264653), // Biru tua untuk nuansa yang lebih dalam
+              ),
+              Color(0xFF264653),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

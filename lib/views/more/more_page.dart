@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'components/setting_list.dart';
 import 'components/version_tile.dart';
 
-class MoreScreen extends StatelessWidget {
-  const MoreScreen({super.key});
+class MorePage extends StatelessWidget {
+  const MorePage({super.key});
 
   @override
   Widget build(BuildContext context) {

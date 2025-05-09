@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wastego/core/models/donate_model.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:wastego/views/donate/donate_history_screen.dart';
+import 'package:wastego/views/donate/donate_history.dart';
 
 class DetailDonateScreen extends StatefulWidget {
   const DetailDonateScreen({super.key, required this.donateItem});
