@@ -52,7 +52,8 @@ var blogList = [
 6. Hot glue gun or craft glue
 7. Sandpaper
 8. Scissors
-9. Rubbing alcohol
+9. Rubbing 
+
 ''',
     steps: '''
 1. Clean the Jar:
