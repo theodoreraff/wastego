@@ -1,103 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wastego/core/providers/event_provider.dart';
+import 'package:wastego/core/models/event_model.dart';
 
-class EventsPage extends StatelessWidget {
+class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
+
+  @override
+  State<EventsPage> createState() => _EventsPageState();
+}
+
+class _EventsPageState extends State<EventsPage> {
+  String selectedStatus = 'Ongoing';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Events",
-        ), // Menghapus 'const' karena 'Text' bukan const constructor
+        title: const Text("Events"),
         centerTitle: false,
-        leading:
-            BackButton(), // Menghapus 'const' karena 'BackButton' bukan const constructor
+        leading: const BackButton(),
       ),
       body: FutureBuilder(
         future: Provider.of<EventProvider>(context, listen: false).loadEvents(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return Center(child: CircularProgressIndicator());
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Terjadi kesalahan: ${snapshot.error}",
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
           }
 
           return Consumer<EventProvider>(
-            builder: (context, provider, child) {
-              final events = provider.events;
+            builder: (context, provider, _) {
+              final events = provider.events ?? [];
 
               return SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 8),
-                    Text(
-                      "Lokasi Kamu:", // Menghapus 'const' karena 'Text' bukan const constructor
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    SizedBox(height: 4),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.location_on_outlined, size: 18),
-                          SizedBox(width: 8),
-                          Text("Surabaya, Jawa Timur"),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () {
-                        // TODO: Aksi pilih lokasi
-                      },
-                      child: Text(
-                        "Pilih Lokasi",
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Semua Event:",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                    _buildFilterDropdown(),
+                    const SizedBox(height: 16),
+                    if (events.isEmpty)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 40),
+                          child: Text(
+                            "Tidak ada event tersedia.",
+                            style: TextStyle(color: Colors.grey),
                           ),
                         ),
-                        DropdownButton<String>(
-                          value: "July",
-                          items: [
-                            DropdownMenuItem(
-                              value: "July",
-                              child: Text("July"),
-                            ),
-                            DropdownMenuItem(
-                              value: "August",
-                              child: Text("August"),
-                            ),
-                          ],
-                          onChanged: (String? newValue) {
-                            // TODO: Handle bulan change
-                          },
-                          underline: SizedBox(),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 12),
-                    ...events.map((event) => _buildEventItem(event)).toList(),
+                      )
+                    else
+                      ...events.map(_buildEventItem).toList(),
                   ],
                 ),
               );
@@ -108,63 +71,122 @@ class EventsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEventItem(event) {
+  // Dropdown to filter events by status (Ongoing, Completed, Upcoming)
+  Widget _buildFilterDropdown() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          "Semua Event:",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Container(
+          height: 40,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: selectedStatus,
+              icon: const Icon(Icons.keyboard_arrow_down),
+              items: ['Ongoing', 'Completed', 'Upcoming'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    selectedStatus = newValue;
+                  });
+                }
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Event item widget to display each event
+  Widget _buildEventItem(Event event) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200),
         color: Colors.white,
+        border: Border.all(color: Colors.grey.shade200),
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade100,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          )
+        ],
       ),
       child: Row(
         children: [
-          // Tanggal
           Container(
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: Color(0xFFEDEDED),
+              color: const Color(0xFFEDEDED),
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,
             child: Text(
-              event.date, // Contoh: "02"
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              event.date,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
-          SizedBox(width: 12),
-          // Info Event
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   event.title,
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   "${event.time} • ${event.location}",
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                  style: const TextStyle(fontSize: 13, color: Colors.grey),
                 ),
               ],
             ),
           ),
-          SizedBox(width: 12),
-          // Tombol RSVP
+          const SizedBox(width: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFB6FF16), // Hijau terang
+              backgroundColor: const Color(0xFFB6FF16),
               foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
               ),
             ),
-            onPressed: () {
-              // TODO: Aksi RSVP
+            onPressed: () async {
+              final url = event.rsvpUrl;  // The RSVP URL for the event
+              if (await canLaunchUrl(Uri.parse(url))) {
+                // Try to launch the URL in the external application
+                await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+              } else {
+                // Show error if URL can't be opened
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Tidak dapat membuka tautan.')),
+                );
+              }
             },
-            child: Text("RSVP"),
+            child: const Text("RSVP"),
           ),
         ],
       ),
