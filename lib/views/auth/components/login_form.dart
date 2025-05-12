@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../../widgets/custom_button.dart';
 
+/// A stateful widget that builds the login form UI with
+/// email/password fields and a custom login button.
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
@@ -10,17 +12,23 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  // Controllers to capture input from email and password fields
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  // State variables for loading indicator and password visibility toggle
   bool isLoading = false;
   bool isPasswordVisible = false;
 
+  /// Handles login logic with a simulated delay and success toast.
   void handleLogin() {
     setState(() => isLoading = true);
 
+    // Simulate network request delay
     Future.delayed(const Duration(seconds: 2), () {
       setState(() => isLoading = false);
 
+      // Show a toast message upon successful login
       Fluttertoast.showToast(
         msg: "Login Berhasil!",
         toastLength: Toast.LENGTH_SHORT,
@@ -31,13 +39,14 @@ class _LoginFormState extends State<LoginForm> {
         fontSize: 16.0,
       );
 
-      // Optionally, add a little animation to make it more fun!
+      // Navigate to home screen after short delay
       Future.delayed(const Duration(milliseconds: 200), () {
         Navigator.pushReplacementNamed(context, '/home');
       });
     });
   }
 
+  /// Handles forgot password interaction (not implemented).
   void handleForgotPassword() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -51,6 +60,7 @@ class _LoginFormState extends State<LoginForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Email input label and field
         const Text(
           'Alamat Email',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -70,6 +80,8 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
         const SizedBox(height: 24),
+
+        // Password input label and field with visibility toggle
         const Text('Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         TextField(
@@ -90,6 +102,7 @@ class _LoginFormState extends State<LoginForm> {
                 color: Colors.grey,
               ),
               onPressed: () {
+                // Toggle password visibility
                 setState(() {
                   isPasswordVisible = !isPasswordVisible;
                 });
@@ -97,6 +110,8 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
         ),
+
+        // Forgot password link
         const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerRight,
@@ -112,6 +127,8 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
         ),
+
+        // Login button with loading indicator
         const SizedBox(height: 32),
         CustomButton(
           text: 'Masuk',
