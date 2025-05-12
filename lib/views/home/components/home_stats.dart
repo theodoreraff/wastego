@@ -104,7 +104,7 @@ class HomeStats extends StatelessWidget {
             lineHeight: 6.0,
             percent: progress,
             animation: true,
-            barRadius: const Radius.circular(6),  // radius lebih kecil
+            barRadius: const Radius.circular(6),
             backgroundColor: Colors.white.withOpacity(0.2),
             progressColor: Colors.white,
           ),
