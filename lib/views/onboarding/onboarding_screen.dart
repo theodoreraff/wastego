@@ -1,143 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
-class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+/// A widget that displays a tab switcher for authentication screens,
+/// allowing users to toggle between "Login" and "Register".
+class AuthTabSwitcher extends StatelessWidget {
+  /// Determines whether the "Login" tab is currently selected.
+  final bool isLogin;
 
-  @override
-  _OnboardingScreenState createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final List<String> locations = [
-    'Area 1',
-    'Area 2',
-    'Area 3',
-    'Area 4',
-    'Area 5',
-  ];
-
-  String? selectedLocation;
-  XFile? profileImage;
-
-  Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(source: source);
-    if (image != null) {
-      setState(() {
-        profileImage = image;
-      });
-    }
-  }
-
-  int currentStep = 1;
-
-  void goToNextStep() {
-    setState(() {
-      currentStep = 2;
-    });
-  }
+  /// Creates an [AuthTabSwitcher] with the current tab state.
+  const AuthTabSwitcher({super.key, required this.isLogin});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: currentStep == 1 ? buildStepOne() : buildStepTwo(),
+    return Container(
+      // Container styling with light grey background and rounded corners.
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: [
+          // "Login" tab
+          _buildTab(
+            label: 'Masuk',
+            selected: isLogin,
+            onTap: () {
+              // Navigate to login screen if not already on it
+              if (!isLogin) {
+                Navigator.pushReplacementNamed(context, '/login');
+              }
+            },
+          ),
+          // "Register" tab
+          _buildTab(
+            label: 'Daftar',
+            selected: !isLogin,
+            onTap: () {
+              // Navigate to register screen if not already on it
+              if (isLogin) {
+                Navigator.pushReplacementNamed(context, '/register');
+              }
+            },
+          ),
+        ],
       ),
     );
   }
 
-  Widget buildStepOne() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Center(child: Image.asset('assets/images/logotext.png', height: 100)),
-        const SizedBox(height: 20),
-        const TextField(
-          decoration: InputDecoration(
-            labelText: 'Nama Depan',
-            border: OutlineInputBorder(),
+  /// Builds an individual tab with the given [label], [selected] state,
+  /// and a [onTap] callback for user interaction.
+  Widget _buildTab({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap, // Trigger the callback when the tab is tapped
+        child: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            // Highlight the selected tab with a white background
+            color: selected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
           ),
         ),
-        const SizedBox(height: 16),
-        const TextField(
-          decoration: InputDecoration(
-            labelText: 'Nama Belakang',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 16),
-        const TextField(
-          decoration: InputDecoration(
-            labelText: 'Nomor Telepon',
-            prefixText: '+62 ',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 16),
-        const Text('Alamat'),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          decoration: const InputDecoration(border: OutlineInputBorder()),
-          value: selectedLocation,
-          hint: const Text('Pilih Lokasi'),
-          onChanged: (value) {
-            setState(() {
-              selectedLocation = value;
-            });
-          },
-          items:
-              locations.map((location) {
-                return DropdownMenuItem(value: location, child: Text(location));
-              }).toList(),
-        ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: goToNextStep,
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text('Lanjut'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildStepTwo() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            radius: 60,
-            backgroundImage:
-                profileImage != null
-                    ? FileImage(File(profileImage!.path))
-                    : null,
-            child:
-                profileImage == null
-                    ? const Icon(Icons.person, size: 60, color: Colors.grey)
-                    : null,
-          ),
-          const SizedBox(height: 16),
-          const Text('Your Profile Picture'),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () => _pickImage(ImageSource.gallery),
-            child: const Text('Choose Existing Picture'),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () => _pickImage(ImageSource.camera),
-            child: const Text('Take a Picture'),
-          ),
-          const SizedBox(height: 8),
-          TextButton(onPressed: () {}, child: const Text('Skip')),
-        ],
       ),
     );
   }
