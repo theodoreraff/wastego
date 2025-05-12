@@ -13,23 +13,26 @@ class RequestPickupPage extends StatefulWidget {
 
 class _RequestPickupPageState extends State<RequestPickupPage> {
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
   bool _isPickup = true;
 
   @override
   void dispose() {
     addressController.dispose();
+    noteController.dispose();
     super.dispose();
   }
 
   void submitPickupRequest() {
     final selectedItems = widget.itemWeights.entries.where((e) => e.value > 0).toList();
 
-    if (_isPickup && addressController.text.trim().isEmpty) {
+    // Address validation
+    if (addressController.text.trim().isEmpty) {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: const Text('Alamat Kosong'),
-          content: const Text('Silakan masukkan alamat penjemputan.'),
+          content: const Text('Silakan masukkan alamat yang lengkap.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -41,7 +44,7 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
       return;
     }
 
-    final alamat = _isPickup ? addressController.text : "Jl. Kita Masih Panjang, Jawa Selatan";
+    final alamat = addressController.text;
 
     showDialog(
       context: context,
@@ -53,48 +56,30 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Lottie.asset(
-                'assets/animation/success.json',
-                height: 150,
-                repeat: false,
-              ),
+              Lottie.asset('assets/animation/success.json', height: 150, repeat: false),
               const SizedBox(height: 16),
               const Text(
                 'Permintaan Berhasil!',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF003D3D),
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF003D3D)),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Kami telah menerima permintaan kamu. Terima kasih telah berkontribusi untuk lingkungan 🌱',
+                'Terima kasih telah berkontribusi untuk lingkungan 🌱',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 16),
               Divider(color: Colors.grey.shade300),
               const SizedBox(height: 12),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(Icons.location_on, color: Colors.teal),
                   const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      alamat,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ),
+                  Expanded(child: Text(alamat, style: const TextStyle(fontSize: 14))),
                 ],
               ),
               const SizedBox(height: 12),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: selectedItems.map((item) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 2),
@@ -103,10 +88,8 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
                         Icon(getItemIcon(item.key), size: 20, color: Colors.green),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(
-                            '${item.key}: ${item.value.toStringAsFixed(2)} kg',
-                            style: const TextStyle(fontSize: 14),
-                          ),
+                          child: Text('${item.key}: ${item.value.toStringAsFixed(2)} kg',
+                              style: const TextStyle(fontSize: 14)),
                         ),
                       ],
                     ),
@@ -119,15 +102,9 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
                   backgroundColor: const Color(0xFF003D3D),
                   foregroundColor: const Color(0xFFB8FF00),
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
-                onPressed: () {
-                  Navigator.of(context)
-                    ..pop()
-                    ..pop();
-                },
+                onPressed: () => Navigator.of(context)..pop()..pop(),
                 icon: const Icon(Icons.check_circle_outline),
                 label: const Text('Selesai'),
               ),
@@ -141,14 +118,10 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
   @override
   Widget build(BuildContext context) {
     final selectedItems = widget.itemWeights.entries.where((e) => e.value > 0).toList();
-    const String bankSampahAddress = "Jl. Kita Masih Panjang, Jawa Selatan";
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Permintaan Penjemputan',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Permintaan Penjemputan', style: TextStyle(fontWeight: FontWeight.bold)),
         leading: const BackButton(),
       ),
       body: SingleChildScrollView(
@@ -156,19 +129,8 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.yellow.shade100,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                '🔄 Pilih *Pickup* jika kamu ingin kami menjemput sampah ke rumahmu.\n'
-                    '🚗 Pilih *Drop Off* jika kamu ingin mengantar langsung ke bank sampah.',
-                style: TextStyle(fontSize: 14),
-              ),
-            ),
+            _buildInfoBox(),
+            const SizedBox(height: 8),
             Center(
               child: Container(
                 padding: const EdgeInsets.all(6),
@@ -188,70 +150,15 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
             ),
             const SizedBox(height: 24),
             const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '📍 Alamat Penjemputan',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  _isPickup
-                      ? TextField(
-                    controller: addressController,
-                    decoration: InputDecoration(
-                      hintText: 'Masukkan alamat lengkap...',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    maxLines: 2,
-                  )
-                      : Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.teal.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.teal.shade200),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.teal),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            bankSampahAddress,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1),
             const SizedBox(height: 16),
-            const Text(
-              '♻️ Daftar Sampah yang Dipilih',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
+            const Text('📍 Alamat Pengantaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            _isPickup ? _buildPickupAddressFields() : _buildDropOffAddressFields(),
+            const Divider(height: 32),
+            const Text('♻️ Daftar Sampah yang Dipilih', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             if (selectedItems.isEmpty)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text(
-                    'Belum ada item yang dipilih.',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-              )
+              _buildEmptyItemBox()
             else
               Column(
                 children: selectedItems.map((item) {
@@ -288,25 +195,97 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
     );
   }
 
-  IconData getItemIcon(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('plastik')) return Icons.local_drink;
-    if (lower.contains('kertas')) return Icons.description;
-    if (lower.contains('elektronik')) return Icons.devices_other;
-    if (lower.contains('logam')) return Icons.build;
-    if (lower.contains('kaca')) return Icons.wine_bar;
-    return Icons.recycling;
+  Widget _buildInfoBox() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.green.shade100,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Text(
+        '🔄 Pilih *Pickup* jika kamu ingin kami menjemput sampah ke rumahmu.\n'
+            '🚗 Pilih *Drop Off* jika kamu ingin mengantar langsung ke bank sampah.',
+        style: TextStyle(fontSize: 14),
+      ),
+    );
+  }
+
+  Widget _buildPickupAddressFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 160,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(12),
+            image: const DecorationImage(
+              image: AssetImage('assets/images/map_placeholder.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Icon(Icons.map, size: 48, color: Colors.white.withOpacity(0.8)),
+        ),
+        const SizedBox(height: 12),
+        _buildLabeledTextField("Alamat Lengkap", "Contoh: Jl. Raya No.10", Icons.home_outlined, addressController),
+        const SizedBox(height: 16),
+        _buildLabeledTextField("Catatan / Patokan Lokasi", "Contoh: Sebelah masjid hijau", Icons.note_alt_outlined, noteController),
+      ],
+    );
+  }
+
+  Widget _buildDropOffAddressFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabeledTextField("Alamat Drop Off", "Contoh: Jl. Raya No.10", Icons.location_on_outlined, addressController),
+        const SizedBox(height: 16),
+        _buildLabeledTextField("Catatan / Patokan Lokasi", "Contoh: Sebelah taman kota", Icons.note_alt_outlined, noteController),
+      ],
+    );
+  }
+
+  Widget _buildLabeledTextField(String label, String hint, IconData icon, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 6),
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: Icon(icon),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+          maxLines: 2,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyItemBox() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Center(
+        child: Text('Belum ada item yang dipilih.', style: TextStyle(color: Colors.grey)),
+      ),
+    );
   }
 
   Widget _buildModeChip(String label, bool selected, bool isPickup) {
     return ChoiceChip(
       label: Row(
         children: [
-          Icon(
-            isPickup ? Icons.directions_car : Icons.location_on_outlined,
-            size: 18,
-            color: selected ? Colors.white : Colors.black54,
-          ),
+          Icon(isPickup ? Icons.directions_car : Icons.location_on_outlined,
+              size: 18, color: selected ? Colors.white : Colors.black54),
           const SizedBox(width: 6),
           Text(label),
         ],
@@ -322,5 +301,15 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     );
+  }
+
+  IconData getItemIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('plastik')) return Icons.local_drink;
+    if (lower.contains('kertas')) return Icons.description;
+    if (lower.contains('elektronik')) return Icons.devices_other;
+    if (lower.contains('logam')) return Icons.build;
+    if (lower.contains('kaca')) return Icons.wine_bar;
+    return Icons.recycling;
   }
 }
