@@ -4,7 +4,6 @@ import 'package:wastego/views/recycle/request_pickup_page.dart';
 import 'package:wastego/views/recycle/info_page.dart';
 import '../../widgets/custom_button.dart';
 
-/// Halaman utama untuk fitur daur ulang di aplikasi WasteGo.
 class RecyclePage extends StatefulWidget {
   const RecyclePage({super.key});
 
@@ -34,23 +33,46 @@ class _RecyclePageState extends State<RecyclePage> {
     'Kardus': LucideIcons.box,
   };
 
+  final Map<String, TextEditingController> controllers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    for (var key in itemWeights.keys) {
+      controllers[key] = TextEditingController();
+    }
+  }
+
+  @override
+  void dispose() {
+    for (var controller in controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
   void showAlert(String action) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Tunggu dulu!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          title: const Text('Tunggu dulu!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           content: Text(
             action == 'estimasi'
                 ? 'Masukkan berat barang untuk melihat estimasi nilai tukar.'
                 : 'Belum ada barang yang ditambahkan untuk dijemput, ayo isi beratnya!',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
+            style:
+            const TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Oke', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFF003D3D)),
+              child: const Text('Oke',
+                  style:
+                  TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF003D3D)),
             ),
           ],
         );
@@ -59,7 +81,8 @@ class _RecyclePageState extends State<RecyclePage> {
   }
 
   void showEstimationSheet() {
-    final totalKg = itemWeights.values.fold(0.0, (sum, weight) => sum + weight);
+    final totalKg =
+    itemWeights.values.fold(0.0, (sum, weight) => sum + weight);
     if (totalKg == 0) {
       showAlert('estimasi');
       return;
@@ -77,17 +100,28 @@ class _RecyclePageState extends State<RecyclePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Center(
-              child: Text('Estimasi Penukaran', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              child: Text('Estimasi Penukaran',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             ),
             const SizedBox(height: 12),
-            ...itemWeights.entries.where((entry) => entry.value > 0).map(
+            ...itemWeights.entries
+                .where((entry) => entry.value > 0)
+                .map(
                   (entry) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${entry.key} (${entry.value.toStringAsFixed(2)} kg)', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                    Text('Rp${(entry.value * itemPricesPerKg[entry.key]!).toStringAsFixed(0)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(
+                      '${entry.key} (${entry.value.toStringAsFixed(2)} kg)',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      'Rp${(entry.value * itemPricesPerKg[entry.key]!).toStringAsFixed(0)}',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
                   ],
                 ),
               ),
@@ -96,10 +130,13 @@ class _RecyclePageState extends State<RecyclePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Total Estimasi:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text('Total Estimasi:',
+                    style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Text(
                   'Rp${itemWeights.entries.map((e) => e.value * itemPricesPerKg[e.key]!).reduce((a, b) => a + b).toStringAsFixed(0)}',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -118,7 +155,8 @@ class _RecyclePageState extends State<RecyclePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recycle', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+        title: const Text('Recycle',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
         leading: const BackButton(),
         actions: [
           Padding(
@@ -126,18 +164,18 @@ class _RecyclePageState extends State<RecyclePage> {
             child: IconButton(
               icon: const Icon(Icons.info_outline, size: 28),
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const InfoPage()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const InfoPage()));
               },
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView( // Membungkus seluruh body dengan SingleChildScrollView
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // Container edukasi dan motivasi pengguna
               Container(
                 margin: const EdgeInsets.only(bottom: 20),
                 padding: const EdgeInsets.all(14),
@@ -154,18 +192,17 @@ class _RecyclePageState extends State<RecyclePage> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              // Penambahan kalimat instruksi sesuai permintaan
               const Text(
                 'Isi berat barang dalam kilogram (kg) untuk masing-masing kategori yang tersedia.',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              // Loop untuk menampilkan barang dan input berat
               ...itemWeights.keys.map((key) {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(color: Colors.grey.shade300),
@@ -178,22 +215,46 @@ class _RecyclePageState extends State<RecyclePage> {
                       Expanded(
                         child: Text(
                           key,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ),
                       SizedBox(
-                        width: 70,
-                        child: TextField(
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          decoration: const InputDecoration(
-                            hintText: 'kg',
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              itemWeights[key] = double.tryParse(value) ?? 0.0;
-                            });
+                        width: 55,
+                        child: StatefulBuilder(
+                          builder: (context, setInnerState) {
+                            final controller = controllers[key]!;
+                            final hasText = controller.text.isNotEmpty;
+                            return TextField(
+                              controller: controller,
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              decoration: InputDecoration(
+                                hintText: hasText ? null : 'kg',
+                                labelText: hasText ? 'kg' : null,
+                                floatingLabelBehavior: FloatingLabelBehavior.auto,
+                                labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                hintStyle: const TextStyle(color: Colors.grey),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(color: Colors.grey),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(color: Color(0xFF003D3D), width: 2),
+                                ),
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  itemWeights[key] = double.tryParse(value) ?? 0.0;
+                                });
+                                setInnerState(() {});
+                              },
+                            );
                           },
                         ),
                       ),
@@ -216,7 +277,8 @@ class _RecyclePageState extends State<RecyclePage> {
                 textColor: const Color(0xFFB8FF00),
                 icon: Icons.local_shipping_outlined,
                 onPressed: () {
-                  final totalKg = itemWeights.values.fold(0.0, (sum, weight) => sum + weight);
+                  final totalKg =
+                  itemWeights.values.fold(0.0, (sum, weight) => sum + weight);
                   if (totalKg == 0) {
                     showAlert('penjemputan');
                     return;
@@ -224,7 +286,8 @@ class _RecyclePageState extends State<RecyclePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => RequestPickupPage(itemWeights: itemWeights),
+                      builder: (_) =>
+                          RequestPickupPage(itemWeights: itemWeights),
                     ),
                   );
                 },
