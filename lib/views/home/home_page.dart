@@ -17,6 +17,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   // Simulated user data (to be replaced with real data from backend/API)
+  // TODO: Replaced Backend/API
   final String _userName = 'WasteHero';
   final int _points = 145000;
   final String _userId = 'WGO-001234';
