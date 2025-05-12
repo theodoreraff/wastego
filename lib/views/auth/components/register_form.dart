@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../widgets/custom_button.dart';
 
+/// A form widget that allows users to register with email, password,
+/// password confirmation, and agreement to terms.
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
 
@@ -9,9 +11,12 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
+  // Controllers for input fields
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  // State variables for visibility toggles and form control
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
   bool _agreeToTerms = false;
@@ -19,17 +24,21 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   void dispose() {
+    // Dispose controllers to free memory when the widget is removed
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
+  /// Handles the registration logic with basic password match validation.
+  /// Simulates a network request and navigates to the home screen on success.
   void _handleRegister() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
+    // Check if password and confirmation match
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password dan konfirmasi tidak sama')),
@@ -40,16 +49,17 @@ class _RegisterFormState extends State<RegisterForm> {
     setState(() => isLoading = true);
 
     try {
-      // TODO: Ganti dengan API request nyata ke backend kalian
+      // Simulate a network request (replace with real API call)
       await Future.delayed(const Duration(seconds: 2));
       debugPrint('Registering $email');
 
-      // Setelah sukses, redirect ke halaman home
+      // Navigate to home screen after successful registration
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Registrasi gagal: $e')));
+      // Display error if registration fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registrasi gagal: $e')),
+      );
     } finally {
       setState(() => isLoading = false);
     }
@@ -60,10 +70,8 @@ class _RegisterFormState extends State<RegisterForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Alamat Email',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        // Email field
+        const Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 5),
         TextField(
           controller: _emailController,
@@ -79,6 +87,8 @@ class _RegisterFormState extends State<RegisterForm> {
           ),
         ),
         const SizedBox(height: 24),
+
+        // Password field with visibility toggle
         const Text('Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 5),
         TextField(
@@ -105,10 +115,9 @@ class _RegisterFormState extends State<RegisterForm> {
           ),
         ),
         const SizedBox(height: 24),
-        const Text(
-          'Konfirmasi Kata Sandi',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+
+        // Confirm password field with visibility toggle
+        const Text('Konfirmasi Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 5),
         TextField(
           controller: _confirmPasswordController,
@@ -124,20 +133,18 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             suffixIcon: IconButton(
               icon: Icon(
-                _confirmPasswordVisible
-                    ? Icons.visibility
-                    : Icons.visibility_off,
+                _confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
                 color: Colors.grey,
               ),
               onPressed: () {
-                setState(
-                  () => _confirmPasswordVisible = !_confirmPasswordVisible,
-                );
+                setState(() => _confirmPasswordVisible = !_confirmPasswordVisible);
               },
             ),
           ),
         ),
         const SizedBox(height: 5),
+
+        // Terms and conditions checkbox
         Row(
           children: [
             Checkbox(
@@ -152,6 +159,8 @@ class _RegisterFormState extends State<RegisterForm> {
           ],
         ),
         const SizedBox(height: 5),
+
+        // Register button with loading state
         CustomButton(
           text: 'Daftar',
           isLoading: isLoading,
