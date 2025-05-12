@@ -53,14 +53,14 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Tombol Logout menggunakan CustomButton
+            // Logout Button
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
                 vertical: 12,
               ),
               child: CustomButton(
-                text: 'Keluar',  // Pastikan 'text' tidak kosong
+                text: 'Keluar',
                 onPressed: () => _logout(context),
                 backgroundColor: const Color(0xFFB8FF00),
                 textColor: Colors.black,
@@ -175,7 +175,7 @@ class _ProfileBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 CustomButton(
-                  text: 'Tutup',  // Tambahkan teks yang sesuai
+                  text: 'Tutup',
                   textColor: Colors.white,
                   isLoading: false,
                   onPressed: () => Navigator.pop(context),
