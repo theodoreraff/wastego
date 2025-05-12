@@ -18,7 +18,7 @@ import '../views/onboarding/onboarding_page.dart';
 import '../views/splash/splash_page.dart';
 
 class AppRoutes {
-  static const String splash = '/splash'; // Menambahkan route splash
+  static const String splash = '/splash';
   static const String login = '/';
   static const String register = '/register';
   static const String home = '/home';
@@ -38,7 +38,7 @@ class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case splash:
-        return MaterialPageRoute(builder: (_) => SplashPage()); // Menambahkan SplashPage route
+        return MaterialPageRoute(builder: (_) => SplashPage());
       case login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case register:
