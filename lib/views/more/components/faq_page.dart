@@ -78,7 +78,7 @@ class FAQPage extends StatelessWidget {
       TextSpan(
         children: [
           const TextSpan(
-            text: '❝Punya pertanyaan? ❞\n',
+            text: 'Punya pertanyaan?',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
