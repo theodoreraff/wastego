@@ -34,7 +34,7 @@ class ComingSoonScreen extends StatelessWidget {
             children: [
               const Icon(
                 Icons
-                    .recycling, // Ikon yang lebih relevan dengan waste management
+                    .recycling,
                 size: 120,
                 color: Colors.white,
               ),
@@ -53,11 +53,11 @@ class ComingSoonScreen extends StatelessWidget {
                 text: 'Tunggu Pembaruan',
                 backgroundColor: const Color(
                   0xFF1D3557,
-                ), // Biru tua yang elegan
+                ),
                 textColor: Colors.white,
                 icon: Icons.update,
                 onPressed: () {
-                  Navigator.pop(context); // Kembali ke halaman sebelumnya
+                  Navigator.pop(context);
                 },
               ),
             ],
