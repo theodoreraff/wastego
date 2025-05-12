@@ -4,7 +4,7 @@ class Event {
   final String date;
   final String time;
   final String location;
-  final String address;
+  final String rsvpUrl;
 
   Event({
     required this.id,
@@ -12,7 +12,7 @@ class Event {
     required this.date,
     required this.time,
     required this.location,
-    required this.address,
+    required this.rsvpUrl,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,7 @@ class Event {
       date: json['date'],
       time: json['time'],
       location: json['location'],
-      address: json['address'],
+      rsvpUrl: json['rsvpUrl'],
     );
   }
 }
