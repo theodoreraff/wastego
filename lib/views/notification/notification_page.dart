@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
 import '../../widgets/custom_button.dart';
 import '../../../core/providers/notification_provider.dart';
-
-
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
