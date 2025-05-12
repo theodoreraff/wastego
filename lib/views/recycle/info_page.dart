@@ -8,37 +8,15 @@ class InfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daur Ulang'),
+        title: const Text('Informasi Daur Ulang'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             const Text(
-              'Kenapa Daur Ulang Itu Penting?',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF003D3D),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Deskripsi
-            const Text(
-              'Daur ulang adalah salah satu cara untuk mengurangi sampah dan menghemat sumber daya alam. '
-              'Dengan mendaur ulang, kita mengurangi penggunaan bahan baku baru, mengurangi energi yang dibutuhkan untuk produksi, '
-              'dan meminimalisir polusi lingkungan. Mari kita bersama-sama berpartisipasi dalam menjaga bumi untuk generasi mendatang.',
-              style: TextStyle(fontSize: 16, color: Colors.black87),
-              textAlign: TextAlign.justify,
-            ),
-            const SizedBox(height: 20),
-
-            // Manfaat Daur Ulang
-            const Text(
-              'Manfaat Daur Ulang:',
+              '📊 Informasi Harga Perkiraan per Kg',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -47,17 +25,40 @@ class InfoPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              '1. Menghemat Sumber Daya Alam.\n'
-              '2. Mengurangi Emisi Karbon.\n'
-              '3. Mengurangi Polusi dan Sampah.\n'
-              '4. Menciptakan Lapangan Kerja.\n'
-              '5. Mengurangi Kebutuhan Energi.\n',
+              'Berikut adalah estimasi harga daur ulang untuk beberapa kategori yang tersedia. '
+                  'Harga dapat bervariasi tergantung lokasi, kondisi barang, dan mitra bank sampah. '
+                  'Gunakan informasi ini sebagai referensi, bukan acuan tetap.',
               style: TextStyle(fontSize: 16, color: Colors.black87),
               textAlign: TextAlign.justify,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+            const Text(
+              '📦 Kardus:\n- Rp 2.000 - Rp 3.000 / kg',
+              style: TextStyle(height: 1.6),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '🧃 Botol Plastik:\n- PET (transparan): Rp 9.000 - Rp 13.500 / kg\n- Botol campuran: Rp 5.000 - Rp 7.000 / kg',
+              style: TextStyle(height: 1.6),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '📄 Kertas:\n- Kertas koran: Rp 2.500 - Rp 3.500 / kg\n- Kertas campuran: Rp 1.500 - Rp 2.500 / kg',
+              style: TextStyle(height: 1.6),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '🛠️ Besi:\n- Besi super: Rp 4.200 / kg\n- Besi biasa: Rp 3.000 / kg',
+              style: TextStyle(height: 1.6),
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              '⚠️ *Catatan: Harga dapat berubah sewaktu-waktu dan hanya sebagai acuan awal. '
+                  'Silakan cek ke bank sampah terdekat untuk info terkini.*',
+              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.black54),
+            ),
 
-            // Ajakan untuk ikut serta
+            const SizedBox(height: 14),
             const Text(
               'Ayo Bergabung dalam Gerakan Daur Ulang!',
               style: TextStyle(
@@ -68,24 +69,20 @@ class InfoPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Setiap langkah kecil yang Anda ambil untuk mendaur ulang memiliki dampak besar bagi planet ini. '
-              'Mari kita mulai dari sekarang dengan mendaur ulang barang-barang yang sudah tidak terpakai di rumah kita. '
-              'Bersama, kita dapat menciptakan perubahan yang nyata!',
+              'Setiap langkah kecil yang Anda ambil untuk mendaur ulang memiliki dampak besar bagi lingkungan. '
+                  'Mulai dari rumah, kita bisa ciptakan perubahan nyata untuk masa depan yang lebih baik.',
               style: TextStyle(fontSize: 16, color: Colors.black87),
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 40),
 
-            // Button
             Center(
               child: CustomButton(
                 text: 'Kembali ke Halaman Utama',
                 backgroundColor: const Color(0xFF003D3D),
                 textColor: const Color(0xFFB8FF00),
                 icon: Icons.arrow_back,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
               ),
             ),
           ],
