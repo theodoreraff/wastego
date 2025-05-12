@@ -1,35 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wastego/widgets/custom_button.dart';
 
 class HelpPage extends StatelessWidget {
   const HelpPage({super.key});
 
   // Open default email app
-  void _sendEmail() async {
-    final Uri emailUri = Uri(
+  Future<void> _sendEmail() async {
+    final emailUri = Uri(
       scheme: 'mailto',
       path: 'support@wastego.id',
-      query: Uri.encodeFull(
-        'subject=Laporan Masalah Aplikasi WasteGo&body=Halo tim WasteGo,\n\nSaya ingin melaporkan masalah berikut:\n\n[Tuliskan masalah Anda di sini]',
-      ),
-    );
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    } else {
+      queryParameters: {
+        'subject': 'Laporan Masalah Aplikasi WasteGo',
+        'body':
+        'Halo tim WasteGo,\n\nSaya ingin melaporkan masalah berikut:\n\n[Tuliskan masalah Anda di sini]',
+      },
+    ).toString();
+
+    final ok = await launchUrlString(emailUri, mode: LaunchMode.externalApplication);
+    if (!ok) {
       debugPrint('Could not launch email client');
     }
   }
 
   // Open WhatsApp chat with predefined message
-  void _openWhatsApp() async {
-    final Uri whatsappUri = Uri.parse(
-      'https://wa.me/6281234567890?text=${Uri.encodeComponent("Halo tim WasteGo, saya butuh bantuan.")}',
-    );
-    if (await canLaunchUrl(whatsappUri)) {
-      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
-    } else {
+  Future<void> _openWhatsApp() async {
+    final phone = '6281234567890';
+    final message = Uri.encodeComponent('Halo tim WasteGo, saya butuh bantuan.');
+    final whatsappUrl = 'https://wa.me/$phone?text=$message';
+
+    final ok = await launchUrlString(whatsappUrl, mode: LaunchMode.externalApplication);
+    if (!ok) {
       debugPrint('Could not launch WhatsApp');
     }
   }
@@ -73,7 +75,6 @@ class HelpPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 28),
-
               Row(
                 children: [
                   Expanded(
@@ -97,7 +98,6 @@ class HelpPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 32),
-
               Row(
                 children: [
                   const Text(
@@ -125,7 +125,6 @@ class HelpPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-
               Card(
                 color: Colors.white,
                 elevation: 3,
