@@ -5,7 +5,7 @@ import 'package:wastego/routes/app_routes.dart';
 import 'package:wastego/core/models/onboarding_model.dart';
 
 class OnboardingController {
-  final PageController pageController = PageController(); // PageController should be recognized now
+  final PageController pageController = PageController();
   int currentPage = 0;
   Timer? _autoSlideTimer;
 
