@@ -32,6 +32,8 @@ dependencies:
   flutter_localization: ^0.3.2
   share_plus: ^11.0.0
   lottie: ^3.3.1
+  image_cropper: ^9.0.0
+  
 
 dev_dependencies:
   flutter_test:
