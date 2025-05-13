@@ -9,6 +9,7 @@ import 'package:wastego/core/providers/schedule_provider.dart';
 import 'package:wastego/core/providers/event_provider.dart';
 import 'package:wastego/core/providers/notification_provider.dart';
 
+
 // void main() {
 //   SystemChrome.setSystemUIOverlayStyle(
 //     const SystemUiOverlayStyle(
@@ -61,6 +62,9 @@ import 'package:wastego/core/providers/notification_provider.dart';
 import 'package:wastego/views/onboarding/onboarding_page_step2.dart';
 void main() {
   // Menyesuaikan status bar & nav bar agar terlihat bersih
+
+void main() {
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.white,
@@ -70,7 +74,20 @@ void main() {
     ),
   );
 
+
   runApp(const MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ScheduleProvider()),
+        ChangeNotifierProvider(create: (_) => EventProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -79,8 +96,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       title: 'WasteGo App',
       debugShowCheckedModeBanner: false,
+
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppRoutes.onboarding,
+      onGenerateRoute: AppRoutes.generateRoute,
+
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
@@ -93,7 +116,10 @@ class MyApp extends StatelessWidget {
           systemOverlayStyle: SystemUiOverlayStyle.dark,
         ),
       ),
+
       home: const OnboardingPageStep2(),
+
+
     );
   }
 }

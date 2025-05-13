@@ -5,12 +5,17 @@ class CustomButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color backgroundColor;
   final Color textColor;
+
   final TextStyle? textStyle;
   final Color borderColor;
   final double borderWidth;
   final IconData? icon;
   final bool isLoading;
   final double? elevation;
+
+  final IconData? icon;
+  final bool isLoading;
+
 
   const CustomButton({
     Key? key,
@@ -22,12 +27,17 @@ class CustomButton extends StatelessWidget {
     this.textColor = const Color(
       0xFFAFEE00,
     ), // Default text color (Light Green)
+
     this.textStyle,
     this.borderColor = Colors.transparent, // Default border color (Transparent)
     this.borderWidth = 1.5,
     this.icon,
     this.isLoading = false,
     this.elevation = 0,
+
+    this.icon,
+    this.isLoading = false,
+
   }) : super(key: key);
 
   @override
@@ -43,13 +53,22 @@ class CustomButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+
           elevation: elevation ?? 4, // Slight shadow for better focus
+
+          elevation: 4, // Slight shadow for better focus
+
           padding: const EdgeInsets.symmetric(
             vertical: 14,
           ), // Padding for a clean look
           side: BorderSide(
+
             color: isDisabled ? Colors.grey : borderColor,
             width: borderWidth, // Border color adjustment
+
+            color: isDisabled ? Colors.grey : backgroundColor,
+            width: 1.5, // Border color adjustment
+
           ),
         ),
         onPressed: isDisabled ? null : onPressed,
@@ -65,6 +84,7 @@ class CustomButton extends StatelessWidget {
                   children: [
                     Text(
                       text,
+
                       style:
                           textStyle ??
                           TextStyle(
@@ -73,6 +93,13 @@ class CustomButton extends StatelessWidget {
                             fontWeight:
                                 FontWeight.bold,
                           ),
+
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold, // Bolder text for emphasis
+                      ),
+
                     ),
                     if (icon != null) ...[
                       const SizedBox(width: 8),
