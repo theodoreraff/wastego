@@ -4,7 +4,6 @@ class EventService {
   Future<List<Event>> fetchEvents() async {
     // Simulasi delay fetch data
     await Future.delayed(const Duration(seconds: 1));
-
     return [
       Event(
         id: 'indo-waste-2025',
