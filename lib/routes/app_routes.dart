@@ -17,6 +17,10 @@ import '../views/poin/poin_page.dart';
 import '../views/onboarding/onboarding_page.dart';
 import '../views/splash/splash_page.dart';
 
+import '../views/onboarding/onboarding_page_step1.dart';
+import '../views/onboarding/onboarding_page_step2.dart';
+import '../views/onboarding/onboarding_screen1.dart';
+
 class AppRoutes {
   static const String splash = '/splash';
   static const String login = '/';
@@ -34,6 +38,10 @@ class AppRoutes {
   static const String help = '/help';
   static const String points = '/points';
   static const String onboarding = '/onboarding';
+
+  static const String onboardingStep1 = '/onboardingStep1';
+  static const String onboardingStep2 = '/onboardingStep2';
+  static const String onboardingScreen1 = '/onboardingScreen1';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -69,6 +77,12 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const PointsPage());
       case onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingPage());
+      case onboardingStep1:
+        return MaterialPageRoute(builder: (_) => const OnboardingPageStep1());
+      case onboardingStep2:
+        return MaterialPageRoute(builder: (_) => const OnboardingPageStep2());
+      case onboardingScreen1:
+        return MaterialPageRoute(builder: (_) => const OnboardingScreen1());
 
       default:
         return MaterialPageRoute(builder: (_) => const LoginPage());

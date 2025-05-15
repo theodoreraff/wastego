@@ -24,22 +24,24 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
   }
 
   void submitPickupRequest() {
-    final selectedItems = widget.itemWeights.entries.where((e) => e.value > 0).toList();
+    final selectedItems =
+        widget.itemWeights.entries.where((e) => e.value > 0).toList();
 
     // Address validation
     if (addressController.text.trim().isEmpty) {
       showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Alamat Kosong'),
-          content: const Text('Silakan masukkan alamat yang lengkap.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
+        builder:
+            (_) => AlertDialog(
+              title: const Text('Alamat Kosong'),
+              content: const Text('Silakan masukkan alamat yang lengkap.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
             ),
-          ],
-        ),
       );
       return;
     }
@@ -49,80 +51,118 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Lottie.asset('assets/animation/success.json', height: 150, repeat: false),
-              const SizedBox(height: 16),
-              const Text(
-                'Permintaan Berhasil!',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF003D3D)),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Terima kasih telah berkontribusi untuk lingkungan 🌱',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 16),
-              Divider(color: Colors.grey.shade300),
-              const SizedBox(height: 12),
-              Row(
+      builder:
+          (_) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.location_on, color: Colors.teal),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(alamat, style: const TextStyle(fontSize: 14))),
+                  Lottie.asset(
+                    'assets/animation/success.json',
+                    height: 150,
+                    repeat: false,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Permintaan Berhasil!',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF003D3D),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Terima kasih telah berkontribusi untuk lingkungan 🌱',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(color: Colors.grey.shade300),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.teal),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          alamat,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Column(
+                    children:
+                        selectedItems.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  getItemIcon(item.key),
+                                  size: 20,
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '${item.key}: ${item.value.toStringAsFixed(2)} kg',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF003D3D),
+                      foregroundColor: const Color(0xFFB8FF00),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed:
+                        () =>
+                            Navigator.of(context)
+                              ..pop()
+                              ..pop()
+                              ..pop(),
+                    
+                    label: const Text('Selesai'),
+                  ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Column(
-                children: selectedItems.map((item) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Icon(getItemIcon(item.key), size: 20, color: Colors.green),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text('${item.key}: ${item.value.toStringAsFixed(2)} kg',
-                              style: const TextStyle(fontSize: 14)),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF003D3D),
-                  foregroundColor: const Color(0xFFB8FF00),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                onPressed: () => Navigator.of(context)..pop()..pop(),
-                icon: const Icon(Icons.check_circle_outline),
-                label: const Text('Selesai'),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final selectedItems = widget.itemWeights.entries.where((e) => e.value > 0).toList();
+    final selectedItems =
+        widget.itemWeights.entries.where((e) => e.value > 0).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Permintaan Penjemputan', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Permintaan Penjemputan',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         leading: const BackButton(),
+        scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -151,39 +191,62 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
             const SizedBox(height: 24),
             const Divider(height: 1),
             const SizedBox(height: 16),
-            const Text('📍 Alamat Pengantaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text(
+              '📍 Alamat Pengantaran',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
-            _isPickup ? _buildPickupAddressFields() : _buildDropOffAddressFields(),
+            _isPickup
+                ? _buildPickupAddressFields()
+                : _buildDropOffAddressFields(),
             const Divider(height: 32),
-            const Text('♻️ Daftar Sampah yang Dipilih', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text(
+              '♻️ Daftar Sampah yang Dipilih',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             if (selectedItems.isEmpty)
               _buildEmptyItemBox()
             else
               Column(
-                children: selectedItems.map((item) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(getItemIcon(item.key), color: Colors.green),
-                        const SizedBox(width: 12),
-                        Expanded(child: Text(item.key, style: const TextStyle(fontSize: 16))),
-                        Text('${item.value.toStringAsFixed(2)} kg',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                children:
+                    selectedItems.map((item) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(getItemIcon(item.key), color: Colors.green),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                item.key,
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Text(
+                              '${item.value.toStringAsFixed(2)} kg',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
               ),
             const SizedBox(height: 24),
             CustomButton(
-              text: _isPickup ? 'Konfirmasi Penjemputan' : 'Konfirmasi Drop Off',
+              text:
+                  _isPickup ? 'Konfirmasi Penjemputan' : 'Konfirmasi Drop Off',
               backgroundColor: const Color(0xFF003D3D),
               textColor: const Color(0xFFB8FF00),
               icon: Icons.local_shipping_outlined,
@@ -205,7 +268,7 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
       ),
       child: const Text(
         '🔄 Pilih *Pickup* jika kamu ingin kami menjemput sampah ke rumahmu.\n'
-            '🚗 Pilih *Drop Off* jika kamu ingin mengantar langsung ke bank sampah.',
+        '🚗 Pilih *Drop Off* jika kamu ingin mengantar langsung ke bank sampah.',
         style: TextStyle(fontSize: 14),
       ),
     );
@@ -226,12 +289,26 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
             ),
           ),
           alignment: Alignment.center,
-          child: Icon(Icons.map, size: 48, color: Colors.white.withOpacity(0.8)),
+          child: Icon(
+            Icons.map,
+            size: 48,
+            color: Colors.white.withOpacity(0.8),
+          ),
         ),
         const SizedBox(height: 12),
-        _buildLabeledTextField("Alamat Lengkap", "Contoh: Jl. Raya No.10", Icons.home_outlined, addressController),
+        _buildLabeledTextField(
+          "Alamat Lengkap",
+          "Contoh: Jl. Raya No.10",
+          Icons.home_outlined,
+          addressController,
+        ),
         const SizedBox(height: 16),
-        _buildLabeledTextField("Catatan / Patokan Lokasi", "Contoh: Sebelah masjid hijau", Icons.note_alt_outlined, noteController),
+        _buildLabeledTextField(
+          "Catatan / Patokan Lokasi",
+          "Contoh: Sebelah masjid hijau",
+          Icons.note_alt_outlined,
+          noteController,
+        ),
       ],
     );
   }
@@ -240,18 +317,36 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabeledTextField("Alamat Drop Off", "Contoh: Jl. Raya No.10", Icons.location_on_outlined, addressController),
+        _buildLabeledTextField(
+          "Alamat Drop Off",
+          "Contoh: Jl. Raya No.10",
+          Icons.location_on_outlined,
+          addressController,
+        ),
         const SizedBox(height: 16),
-        _buildLabeledTextField("Catatan / Patokan Lokasi", "Contoh: Sebelah taman kota", Icons.note_alt_outlined, noteController),
+        _buildLabeledTextField(
+          "Catatan / Patokan Lokasi",
+          "Contoh: Sebelah taman kota",
+          Icons.note_alt_outlined,
+          noteController,
+        ),
       ],
     );
   }
 
-  Widget _buildLabeledTextField(String label, String hint, IconData icon, TextEditingController controller) {
+  Widget _buildLabeledTextField(
+    String label,
+    String hint,
+    IconData icon,
+    TextEditingController controller,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
@@ -259,9 +354,12 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
             hintText: hint,
             prefixIcon: Icon(icon),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
-          maxLines: 2,
+          maxLines: null,
         ),
       ],
     );
@@ -275,17 +373,25 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: const Center(
-        child: Text('Belum ada item yang dipilih.', style: TextStyle(color: Colors.grey)),
+        child: Text(
+          'Belum ada item yang dipilih.',
+          style: TextStyle(color: Colors.grey),
+        ),
       ),
     );
   }
 
   Widget _buildModeChip(String label, bool selected, bool isPickup) {
     return ChoiceChip(
+      showCheckmark: true,
+      checkmarkColor: selected ? Colors.white : Colors.transparent,
       label: Row(
         children: [
-          Icon(isPickup ? Icons.directions_car : Icons.location_on_outlined,
-              size: 18, color: selected ? Colors.white : Colors.black54),
+          Icon(
+            isPickup ? Icons.directions_car : Icons.location_on_outlined,
+            size: 18,
+            color: selected ? Colors.white : Colors.black54,
+          ),
           const SizedBox(width: 6),
           Text(label),
         ],

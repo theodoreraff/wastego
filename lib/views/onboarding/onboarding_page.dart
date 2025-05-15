@@ -33,7 +33,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   void initState() {
     super.initState();
-    _controller.startAutoSlide(context);
+    // Tidak perlu startAutoSlide disini, hanya tombol yang akan mengatur peralihan
   }
 
   @override
@@ -88,6 +88,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Tombol "Ayo Mulai Perubahan!" hanya muncul di halaman terakhir
                 if (_controller.currentPage == onboardingItems.length - 1)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
@@ -101,11 +102,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
             Positioned(
               top: 16,
               right: 20,
-              child: TextButton(
-                onPressed: () => _controller.completeOnboarding(context),
-                child: const Text(
-                  'Lanjutkan',
-                  style: TextStyle(color: Colors.black54),
+              child: Visibility(
+                visible: _controller.currentPage != onboardingItems.length - 1, // Menyembunyikan tombol di slide terakhir
+                child: TextButton(
+                  onPressed: () {
+                    if (_controller.currentPage < onboardingItems.length - 1) {
+                      _controller.pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.ease,
+                      );
+                    }
+                  },
+                  child: const Text(
+                    'Lanjutkan',
+                    style: TextStyle(color: Colors.black54),
+                  ),
                 ),
               ),
             ),

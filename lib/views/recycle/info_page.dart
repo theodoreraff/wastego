@@ -9,6 +9,7 @@ class InfoPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Informasi Daur Ulang'),
+        scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -78,7 +79,7 @@ class InfoPage extends StatelessWidget {
 
             Center(
               child: CustomButton(
-                text: 'Kembali ke Halaman Utama',
+                text: 'Kembali',
                 backgroundColor: const Color(0xFF003D3D),
                 textColor: const Color(0xFFB8FF00),
                 icon: Icons.arrow_back,

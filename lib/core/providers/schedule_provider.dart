@@ -14,14 +14,13 @@ class ScheduleProvider with ChangeNotifier {
 
     await Future.delayed(const Duration(seconds: 1)); // Simulasi loading
 
-    _schedules = List.generate(9, (index) {
-      DateTime date = DateTime(2025, 7, index + 1);
+    _schedules = List.generate(7, (index) {
+      DateTime date = DateTime(2025, 6, index + 1);
       String? time;
 
-      if ([0, 4, 6, 8].contains(index)) {
+      if ([0, 4, 6].contains(index)) {
         time = switch (index) {
           6 => "6:00 AM",
-          8 => "5:30 AM",
           _ => "5:00 AM",
         };
       }

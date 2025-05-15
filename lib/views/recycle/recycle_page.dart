@@ -158,6 +158,7 @@ class _RecyclePageState extends State<RecyclePage> {
         title: const Text('Recycle',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
         leading: const BackButton(),
+        scrolledUnderElevation: 0,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -220,7 +221,7 @@ class _RecyclePageState extends State<RecyclePage> {
                         ),
                       ),
                       SizedBox(
-                        width: 55,
+                        width: 65,
                         child: StatefulBuilder(
                           builder: (context, setInnerState) {
                             final controller = controllers[key]!;
@@ -228,6 +229,7 @@ class _RecyclePageState extends State<RecyclePage> {
                             return TextField(
                               controller: controller,
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              textAlign: TextAlign.center,
                               decoration: InputDecoration(
                                 hintText: hasText ? null : 'kg',
                                 labelText: hasText ? 'kg' : null,

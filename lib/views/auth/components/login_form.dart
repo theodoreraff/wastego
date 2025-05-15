@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../../../widgets/custom_button.dart';
 
-/// A stateful widget that builds the login form UI with
-/// email/password fields and a custom login button.
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
@@ -12,47 +9,86 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  // Controllers to capture input from email and password fields
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
-  // State variables for loading indicator and password visibility toggle
   bool isLoading = false;
   bool isPasswordVisible = false;
 
-  /// Handles login logic with a simulated delay and success toast.
+ final List<Map<String, String>> dummyUsers = [
+    {'email': 'wastego@gmail.com', 'password': 'admin123'},
+    {'email': 'user1@gmail.com', 'password': 'user123'},
+  ];
+
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    return emailRegex.hasMatch(email);
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   void handleLogin() {
-    setState(() => isLoading = true);
+    // final email = emailController.text.trim();
+    // final password = passwordController.text;
 
-    // Simulate network request delay
-    Future.delayed(const Duration(seconds: 2), () {
+    // if (email.isEmpty) {
+    //   _showError('Email tidak boleh kosong.');
+    //   return;
+    // }
+
+    // if (!_isValidEmail(email)) {
+    //   _showError('Format email tidak valid.');
+    //   return;
+    // }
+
+    // if (password.isEmpty) {
+    //   _showError('Password tidak boleh kosong.');
+    //   return;
+    // }
+
+    // if (password.length < 6) {
+    //   _showError('Password minimal 6 karakter.');
+    //   return;
+    // }
+
+    // if (password.contains(' ')) {
+    //   _showError('Password tidak boleh mengandung spasi.');
+    //   return;
+    // }
+
+    // setState(() => isLoading = true);
+
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   setState(() => isLoading = false);
+
+    //   final user = dummyUsers.firstWhere(
+    //     (user) => user['email'] == email,
+    //     orElse: () => {},
+    //   );
+
+    //   if (user.isEmpty) {
+    //     _showError('Anda belum memiliki akun.');
+    //   } else if (user['password'] != password) {
+    //     _showError('Email atau password salah.');
+    //   } else {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(content: Text('Login berhasil!')),
+    //     );
+    //     Future.delayed(const Duration(milliseconds: 300), () {
+    //       Navigator.pushReplacementNamed(context, '/home');
+    //     });
+    //   }
+    // });
+      setState(() => isLoading = true);
+    Future.delayed(const Duration(seconds: 1), () {
       setState(() => isLoading = false);
-
-      // Show a toast message upon successful login
-      Fluttertoast.showToast(
-        msg: "Login Berhasil!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-
-      // Navigate to home screen after short delay
-      Future.delayed(const Duration(milliseconds: 200), () {
-        Navigator.pushReplacementNamed(context, '/home');
-      });
+      Navigator.pushReplacementNamed(context, '/home');
     });
   }
 
-  /// Handles forgot password interaction (not implemented).
   void handleForgotPassword() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Fitur lupa password belum diimplementasi."),
-      ),
-    );
+    _showError('Fitur lupa password belum diimplementasi.');
   }
 
   @override
@@ -60,28 +96,19 @@ class _LoginFormState extends State<LoginForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Email input label and field
-        const Text(
-          'Alamat Email',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        const Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         TextField(
           controller: emailController,
           decoration: const InputDecoration(
             hintText: 'Masukkan Email',
             hintStyle: TextStyle(color: Colors.grey),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-            ),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
           ),
         ),
         const SizedBox(height: 24),
 
-        // Password input label and field with visibility toggle
         const Text('Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         TextField(
@@ -90,28 +117,18 @@ class _LoginFormState extends State<LoginForm> {
           decoration: InputDecoration(
             hintText: 'Masukkan Password',
             hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-            ),
+            enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
             suffixIcon: IconButton(
               icon: Icon(
                 isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                 color: Colors.grey,
               ),
-              onPressed: () {
-                // Toggle password visibility
-                setState(() {
-                  isPasswordVisible = !isPasswordVisible;
-                });
-              },
+              onPressed: () => setState(() => isPasswordVisible = !isPasswordVisible),
             ),
           ),
         ),
 
-        // Forgot password link
         const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerRight,
@@ -128,7 +145,6 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
 
-        // Login button with loading indicator
         const SizedBox(height: 32),
         CustomButton(
           text: 'Masuk',

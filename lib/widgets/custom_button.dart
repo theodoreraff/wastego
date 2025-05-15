@@ -9,6 +9,7 @@ class CustomButton extends StatelessWidget {
   final Color borderColor;
   final double borderWidth;
   final IconData? icon;
+  final bool iconAtStart;
   final bool isLoading;
   final double? elevation;
 
@@ -22,6 +23,7 @@ class CustomButton extends StatelessWidget {
     this.borderColor = Colors.transparent,
     this.borderWidth = 1.5,
     this.icon,
+    this.iconAtStart = true,
     this.isLoading = false,
     this.elevation = 0,
   }) : super(key: key);
@@ -47,30 +49,36 @@ class CustomButton extends StatelessWidget {
           ),
         ),
         onPressed: isDisabled ? null : onPressed,
-        child: isLoading
-            ? const CircularProgressIndicator(
-          color: Colors.white,
-          strokeWidth: 2,
-        )
-            : Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              text,
-              style: textStyle ??
-                  TextStyle(
-                    color: textColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            if (icon != null) ...[
-              const SizedBox(width: 8),
-              Icon(icon, color: textColor),
-            ],
-          ],
-        ),
+        child:
+            isLoading
+                ? const CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (icon != null && iconAtStart) ...[
+                      Icon(icon, color: textColor),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      text,
+                      style:
+                          textStyle ??
+                          TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    if (icon != null && !iconAtStart) ...[
+                      const SizedBox(width: 8),
+                      Icon(icon, color: textColor),
+                    ],
+                  ],
+                ),
       ),
     );
   }

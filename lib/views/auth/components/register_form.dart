@@ -22,6 +22,17 @@ class _RegisterFormState extends State<RegisterForm> {
   bool _agreeToTerms = false;
   bool isLoading = false;
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    return emailRegex.hasMatch(email);
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   void dispose() {
     // Dispose controllers to free memory when the widget is removed
@@ -39,27 +50,56 @@ class _RegisterFormState extends State<RegisterForm> {
     final confirmPassword = _confirmPasswordController.text;
 
     // Check if password and confirmation match
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password dan konfirmasi tidak sama')),
+    if (email.isEmpty) {
+      _showError('Email tidak boleh kosong.');
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showError(
+        'Format email tidak valid. Harus mengandung "@" dan tidak ada spasi.',
       );
+      return;
+    }
+
+    if (password.isEmpty) {
+      _showError('Password tidak boleh kosong.');
+      return;
+    }
+
+    if (password.length < 6) {
+      _showError('Password minimal 6 karakter.');
+      return;
+    }
+
+    if (password.contains(' ')) {
+      _showError('Password tidak boleh mengandung spasi.');
+      return;
+    }
+
+    if (confirmPassword.isEmpty) {
+      _showError('Konfirmasi password tidak boleh kosong.');
+      return;
+    }
+
+    if (password != confirmPassword) {
+      _showError('Password dan konfirmasi tidak sama.');
+      return;
+    }
+
+    if (!_agreeToTerms) {
+      _showError('Anda harus menyetujui syarat dan ketentuan.');
       return;
     }
 
     setState(() => isLoading = true);
 
     try {
-      // Simulate a network request (replace with real API call)
       await Future.delayed(const Duration(seconds: 2));
       debugPrint('Registering $email');
-
-      // Navigate to home screen after successful registration
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/onboardingScreen1');
     } catch (e) {
-      // Display error if registration fails
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registrasi gagal: $e')),
-      );
+      _showError('Registrasi gagal: $e');
     } finally {
       setState(() => isLoading = false);
     }
@@ -71,7 +111,10 @@ class _RegisterFormState extends State<RegisterForm> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Email field
-        const Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          'Alamat Email',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 5),
         TextField(
           controller: _emailController,
@@ -117,7 +160,10 @@ class _RegisterFormState extends State<RegisterForm> {
         const SizedBox(height: 24),
 
         // Confirm password field with visibility toggle
-        const Text('Konfirmasi Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          'Konfirmasi Kata Sandi',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 5),
         TextField(
           controller: _confirmPasswordController,
@@ -133,11 +179,15 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             suffixIcon: IconButton(
               icon: Icon(
-                _confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                _confirmPasswordVisible
+                    ? Icons.visibility
+                    : Icons.visibility_off,
                 color: Colors.grey,
               ),
               onPressed: () {
-                setState(() => _confirmPasswordVisible = !_confirmPasswordVisible);
+                setState(
+                  () => _confirmPasswordVisible = !_confirmPasswordVisible,
+                );
               },
             ),
           ),

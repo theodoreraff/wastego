@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:wastego/views/home/home_page.dart';
 import '../../widgets/custom_button.dart';
 
-
 class OnboardingPageStep2 extends StatefulWidget {
   const OnboardingPageStep2({super.key});
 
@@ -13,9 +12,6 @@ class OnboardingPageStep2 extends StatefulWidget {
 }
 
 class _OnboardingPageStep2State extends State<OnboardingPageStep2> {
-  List<String> countryCodes = ['+62', '+1', '+44', '+81', '+91'];
-  String selectedCode = '+62';
-
   File? _pickedImage;
   bool isNextLoading = false;
 
@@ -51,10 +47,20 @@ class _OnboardingPageStep2State extends State<OnboardingPageStep2> {
         isNextLoading = false;
       });
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      try {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Pendaftaran berhasil!')));
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+      }
     });
   }
 
@@ -87,60 +93,53 @@ class _OnboardingPageStep2State extends State<OnboardingPageStep2> {
                             ),
                   ),
                 ),
-
                 const SizedBox(height: 5),
                 Center(
                   child: Text(
-                    "Your Profile Picture",
+                    "Foto Profil Anda",
                     style: TextStyle(fontSize: 18, color: Color(0xFF003539)),
                   ),
                 ),
                 const SizedBox(height: 15),
-
                 CustomButton(
                   text: 'Pilih Foto Profil',
                   onPressed: _choosePicture,
                   backgroundColor: Colors.white,
-                  textColor: Color(0xFF003539),
+                  textColor: const Color(0xFF003539),
                   borderColor: Colors.black,
                   borderWidth: 1.0,
                   elevation: 0,
                   textStyle: const TextStyle(
                     color: Color(0xFF003539),
-
                     fontSize: 18,
                   ),
                 ),
                 const SizedBox(height: 15),
-
                 CustomButton(
                   text: 'Ambil Foto Profil',
                   onPressed: _takePicture,
                   backgroundColor: Colors.white,
-                  textColor: Color(0xFF003539),
+                  textColor: const Color(0xFF003539),
                   borderColor: Colors.black,
                   borderWidth: 1.0,
                   elevation: 0,
                   textStyle: const TextStyle(
                     color: Color(0xFF003539),
-
                     fontSize: 18,
                   ),
                 ),
                 const SizedBox(height: 15),
-
                 CustomButton(
-                  text: 'Lewati',
+                  text: _pickedImage != null ? 'Selanjutnya' : 'Lewati',
                   isLoading: isNextLoading,
                   onPressed: !isNextLoading ? _next : null,
                   backgroundColor: Colors.white,
-                  textColor: Color(0xFF003539),
+                  textColor: const Color(0xFF003539),
                   borderColor: Colors.black,
                   borderWidth: 1.0,
                   elevation: 0,
                   textStyle: const TextStyle(
                     color: Color(0xFF003539),
-
                     fontSize: 18,
                   ),
                 ),
