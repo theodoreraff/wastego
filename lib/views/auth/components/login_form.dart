@@ -29,62 +29,62 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void handleLogin() {
-    // final email = emailController.text.trim();
-    // final password = passwordController.text;
+    final email = emailController.text.trim();
+    final password = passwordController.text;
 
-    // if (email.isEmpty) {
-    //   _showError('Email tidak boleh kosong.');
-    //   return;
-    // }
+    if (email.isEmpty) {
+      _showError('Email tidak boleh kosong.');
+      return;
+    }
 
-    // if (!_isValidEmail(email)) {
-    //   _showError('Format email tidak valid.');
-    //   return;
-    // }
+    if (!_isValidEmail(email)) {
+      _showError('Format email tidak valid.');
+      return;
+    }
 
-    // if (password.isEmpty) {
-    //   _showError('Password tidak boleh kosong.');
-    //   return;
-    // }
+    if (password.isEmpty) {
+      _showError('Password tidak boleh kosong.');
+      return;
+    }
 
-    // if (password.length < 6) {
-    //   _showError('Password minimal 6 karakter.');
-    //   return;
-    // }
+    if (password.length < 6) {
+      _showError('Password minimal 6 karakter.');
+      return;
+    }
 
-    // if (password.contains(' ')) {
-    //   _showError('Password tidak boleh mengandung spasi.');
-    //   return;
-    // }
+    if (password.contains(' ')) {
+      _showError('Password tidak boleh mengandung spasi.');
+      return;
+    }
 
-    // setState(() => isLoading = true);
+    setState(() => isLoading = true);
 
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   setState(() => isLoading = false);
-
-    //   final user = dummyUsers.firstWhere(
-    //     (user) => user['email'] == email,
-    //     orElse: () => {},
-    //   );
-
-    //   if (user.isEmpty) {
-    //     _showError('Anda belum memiliki akun.');
-    //   } else if (user['password'] != password) {
-    //     _showError('Email atau password salah.');
-    //   } else {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(content: Text('Login berhasil!')),
-    //     );
-    //     Future.delayed(const Duration(milliseconds: 300), () {
-    //       Navigator.pushReplacementNamed(context, '/home');
-    //     });
-    //   }
-    // });
-      setState(() => isLoading = true);
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 2), () {
       setState(() => isLoading = false);
-      Navigator.pushReplacementNamed(context, '/home');
+
+      final user = dummyUsers.firstWhere(
+        (user) => user['email'] == email,
+        orElse: () => {},
+      );
+
+      if (user.isEmpty) {
+        _showError('Anda belum memiliki akun.');
+      } else if (user['password'] != password) {
+        _showError('Email atau password salah.');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login berhasil!')),
+        );
+        Future.delayed(const Duration(milliseconds: 300), () {
+          Navigator.pushReplacementNamed(context, '/home');
+        });
+      }
     });
+    //   setState(() => isLoading = true);
+    // Future.delayed(const Duration(seconds: 1), () {
+    //   setState(() => isLoading = false);
+    //   Navigator.pushReplacementNamed(context, '/home');
+    // });
   }
 
   void handleForgotPassword() {
