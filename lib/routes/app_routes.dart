@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../views/auth/login_page.dart';
 import '../views/auth/register_page.dart';
+import '../views/auth/forgot_password_page.dart';       // import forgot password
+import '../views/auth/otp_verification_page.dart';      // import otp verification
+import '../views/auth/reset_password_page.dart';        // import reset password
 import '../views/home/home_page.dart';
 import '../views/schedule/schedule_page.dart';
 import '../views/recycle/recycle_page.dart';
@@ -25,6 +28,9 @@ class AppRoutes {
   static const String splash = '/splash';
   static const String login = '/';
   static const String register = '/register';
+  static const String forgotPassword = '/forgot-password';          // baru
+  static const String otpVerification = '/verify-otp';               // baru
+  static const String resetPassword = '/reset-password';             // baru
   static const String home = '/home';
   static const String schedule = '/schedule';
   static const String recycle = '/recycle';
@@ -51,6 +57,25 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterPage());
+
+      // case forgotPassword:                                               // baru
+      //   return MaterialPageRoute(builder: (_) => const ForgotPasswordPage());
+      //
+      // case otpVerification:                                               // baru
+      //   final args = settings.arguments as Map<String, dynamic>;
+      //   return MaterialPageRoute(
+      //     builder: (_) => OtpVerificationPage(email: args['email']),
+      //   );
+      //
+      // case resetPassword:                                                 // baru
+      //   final args = settings.arguments as Map<String, dynamic>;
+      //   return MaterialPageRoute(
+      //     builder: (_) => ResetPasswordPage(
+      //       email: args['email'],
+      //       otp: args['otp'],
+      //     ),
+      //   );
+
       case home:
         return MaterialPageRoute(builder: (_) => const HomePage());
       case schedule:
