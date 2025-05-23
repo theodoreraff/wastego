@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:wastego/core/models/tips_model.dart';
 
+/// A screen to display the detailed content of a single environmental tip.
+/// It shows an image, a description, and a numbered list of steps.
 class DetailTipsScreen extends StatelessWidget {
   const DetailTipsScreen({super.key, required this.tipsItem});
 
   final Tips tipsItem;
 
+  /// Builds a list of widgets from a string of steps, parsing numbered and unnumbered lines.
   List<Widget> buildNumberedList(String steps) {
     final lines = steps.trim().split('\n');
-
     List<Widget> items = [];
 
     for (var line in lines) {
       final match = RegExp(r'^(\d+)\.\s+(.*)').firstMatch(line);
       if (match != null) {
+        // Handle numbered steps
         final number = match.group(1)!;
         final text = match.group(2)!;
-
         items.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
@@ -49,6 +51,7 @@ class DetailTipsScreen extends StatelessWidget {
           ),
         );
       } else {
+        // Handle unnumbered lines (e.g., paragraphs within steps)
         items.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
@@ -65,7 +68,6 @@ class DetailTipsScreen extends StatelessWidget {
         );
       }
     }
-
     return items;
   }
 
@@ -87,7 +89,7 @@ class DetailTipsScreen extends StatelessWidget {
             const SizedBox(width: 5),
             Text(
               tipsItem.title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w600,
@@ -123,6 +125,7 @@ class DetailTipsScreen extends StatelessWidget {
                   textAlign: TextAlign.justify,
                 ),
               ),
+              // Dynamically build and insert the numbered list of steps.
               ...buildNumberedList(tipsItem.steps),
             ],
           ),

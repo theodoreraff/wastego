@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_button.dart';
 
+/// A page displaying information about recycling, including estimated prices
+/// for different waste categories and a call to action for environmental contribution.
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});
 
@@ -58,7 +60,6 @@ class InfoPage extends StatelessWidget {
                   'Silakan cek ke bank sampah terdekat untuk info terkini.*',
               style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.black54),
             ),
-
             const SizedBox(height: 14),
             const Text(
               'Ayo Bergabung dalam Gerakan Daur Ulang!',
@@ -76,7 +77,6 @@ class InfoPage extends StatelessWidget {
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 40),
-
             Center(
               child: CustomButton(
                 text: 'Kembali',

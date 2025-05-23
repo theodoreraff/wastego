@@ -22,7 +22,7 @@ class Event {
       date: json['date'],
       time: json['time'],
       location: json['location'],
-      rsvpUrl: json['rsvpUrl'],
+      rsvpUrl: json['rsvpUrl'] ?? '',
     );
   }
 }

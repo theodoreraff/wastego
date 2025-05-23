@@ -3,153 +3,104 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wastego/widgets/custom_button.dart';
 
+/// A help and support page providing options to contact support via email or WhatsApp.
 class HelpPage extends StatelessWidget {
   const HelpPage({super.key});
 
-  // Open default email app
+  /// Launches the default email application with a pre-filled support email.
   Future<void> _sendEmail() async {
     final emailUri = Uri(
       scheme: 'mailto',
       path: 'support@wastego.id',
       queryParameters: {
         'subject': 'Laporan Masalah Aplikasi WasteGo',
-        'body':
-        'Halo tim WasteGo,\n\nSaya ingin melaporkan masalah berikut:\n\n[Tuliskan masalah Anda di sini]',
+        'body': 'Halo tim WasteGo,\n\nSaya mengalami kendala berikut:\n\n[Tuliskan masalah Anda di sini]',
       },
     ).toString();
 
     final ok = await launchUrlString(emailUri, mode: LaunchMode.externalApplication);
     if (!ok) {
-      debugPrint('Could not launch email client');
+      debugPrint('Tidak dapat membuka aplikasi email.');
     }
   }
 
-  // Open WhatsApp chat with predefined message
+  /// Launches WhatsApp with a pre-filled support message.
   Future<void> _openWhatsApp() async {
-    final phone = '6281234567890';
+    final phone = '6287820763118'; // Replace with actual WhatsApp number
     final message = Uri.encodeComponent('Halo tim WasteGo, saya butuh bantuan.');
     final whatsappUrl = 'https://wa.me/$phone?text=$message';
 
     final ok = await launchUrlString(whatsappUrl, mode: LaunchMode.externalApplication);
     if (!ok) {
-      debugPrint('Could not launch WhatsApp');
+      debugPrint('Tidak dapat membuka WhatsApp.');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bantuan'),
+        title: const Text('Pusat Bantuan'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: SvgPicture.asset(
-                  'assets/images/questions.svg',
-                  height: 160,
-                  fit: BoxFit.contain,
-                ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/images/questions.svg',
+              height: 160,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Ada yang Bisa Kami Bantu?',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
-              const Text(
-                'Bingung harus mulai dari mana?',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Kami siap membantu! Kamu bisa laporkan kendala melalui email, atau langsung chat kami via WhatsApp.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.black54,
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Tenang, kami di sini untuk bantu kamu. Kirim tiket atau hubungi bantuan langsung untuk penanganan cepat.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomButton(
+                    text: 'Laporkan Masalah',
+                    onPressed: _sendEmail,
+                    backgroundColor: const Color(0xFF003539),
+                    textColor: const Color(0xFFAFEE00),
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 28),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      text: 'Buat Tiket',
-                      onPressed: _sendEmail,
-                      backgroundColor: const Color(0xFF003539),
-                      textColor: const Color(0xFFAFEE00),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _openWhatsApp,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF003539),
+                      side: const BorderSide(color: Color(0xFF003539), width: 1.4),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: const Text('Chat WhatsApp'),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomButton(
-                      text: 'Panggil Bantuan',
-                      onPressed: _openWhatsApp,
-                      backgroundColor: Colors.white,
-                      textColor: const Color(0xFF003539),
-                      icon: Icons.help_outline,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-              Row(
-                children: [
-                  const Text(
-                    'Riwayat Pengaduan',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const Spacer(),
-                  DropdownButton<String>(
-                    value: '2024',
-                    onChanged: (String? newValue) {
-                      // TODO: Handle year change
-                    },
-                    items: <String>['2024', '2023', '2022', '2021']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Card(
-                color: Colors.white,
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0xFFE5E7EB)),
                 ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  title: const Text(
-                    'Tempat Sampah Tidak Diambil',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: const Text('Pengambilan Terlewatkan'),
-                  trailing: const Icon(
-                    Icons.chevron_right,
-                    color: Color(0xFF003539),
-                  ),
-                  onTap: () {
-                    // TODO: Handle detail view
-                  },
-                ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
       ),
     );

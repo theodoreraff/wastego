@@ -11,15 +11,15 @@ class SettingList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = [
-      {
-        'title': 'Pengaturan Notifikasi',
-        'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const NotificationSettingsPage()),
-          );
-        },
-      },
+      // {
+      //   'title': 'Pengaturan Notifikasi',
+      //   'onTap': () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const NotificationSettingsPage()),
+      //     );
+      //   },
+      // },
       // {
       //   'title': 'Metode Pembayaran',
       //   'onTap': () {

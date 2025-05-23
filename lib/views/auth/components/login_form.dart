@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../core/services/api_service.dart';
 import '../../../views/auth/forgot_password_page.dart';
+import 'package:provider/provider.dart';
+import 'package:wastego/core/providers/profile_provider.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -13,8 +15,12 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final FocusNode emailFocus = FocusNode();
+  final FocusNode passwordFocus = FocusNode();
+
   bool isLoading = false;
   bool isPasswordVisible = false;
+  String? errorMessage;
 
   bool _isValidEmail(String email) {
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
@@ -31,10 +37,20 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
+  void _clearError() {
+    if (errorMessage != null) {
+      setState(() {
+        errorMessage = null;
+      });
+    }
+  }
+
+
   Future<void> handleLogin() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
 
+    // Validasi input tetap sama
     if (email.isEmpty) {
       _showMessage('Email tidak boleh kosong.');
       return;
@@ -56,35 +72,55 @@ class _LoginFormState extends State<LoginForm> {
       return;
     }
 
-    setState(() => isLoading = true);
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
     try {
       final response = await ApiService.login(email, password);
 
-      // Ambil token dari dalam objek user
-      final user = response['user'];
-      final token = user != null ? user['token'] : null;
-
+      final token = response['token'];
       if (token != null) {
+        await ApiService.saveToken(token);
+
+        // Ambil instance ProfileProvider dan fetch profile
+        final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+        await profileProvider.fetchProfile();
+
         _showMessage('Login berhasil!', isError: false);
-        // TODO: Simpan token di local storage (misal: SharedPreferences)
         Future.delayed(const Duration(milliseconds: 500), () {
           Navigator.pushReplacementNamed(context, '/home');
         });
       } else {
-        _showMessage('Login gagal: Token tidak ditemukan.');
+        setState(() {
+          errorMessage = 'Login gagal: Token tidak ditemukan.';
+        });
       }
     } catch (e) {
-      _showMessage('Login gagal: ${e.toString()}');
+      setState(() {
+        errorMessage = 'Login gagal: ${e.toString()}';
+      });
     } finally {
-      setState(() => isLoading = false);
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    emailController.addListener(_clearError);
+    passwordController.addListener(_clearError);
+  }
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+    emailFocus.dispose();
+    passwordFocus.dispose();
     super.dispose();
   }
 
@@ -97,14 +133,17 @@ class _LoginFormState extends State<LoginForm> {
         const SizedBox(height: 8),
         TextField(
           controller: emailController,
+          focusNode: emailFocus,
           keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
+          textInputAction: TextInputAction.next,
+          onSubmitted: (_) => FocusScope.of(context).requestFocus(passwordFocus),
+          decoration: InputDecoration(
             hintText: 'Masukkan Email',
-            hintStyle: TextStyle(color: Colors.grey),
-            enabledBorder: UnderlineInputBorder(
+            hintStyle: const TextStyle(color: Colors.grey),
+            enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.grey),
             ),
-            focusedBorder: UnderlineInputBorder(
+            focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
             ),
           ),
@@ -115,7 +154,10 @@ class _LoginFormState extends State<LoginForm> {
         const SizedBox(height: 8),
         TextField(
           controller: passwordController,
+          focusNode: passwordFocus,
           obscureText: !isPasswordVisible,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => isLoading ? null : handleLogin(),
           decoration: InputDecoration(
             hintText: 'Masukkan Password',
             hintStyle: const TextStyle(color: Colors.grey),
@@ -139,18 +181,27 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
         const SizedBox(height: 8),
+
+        if (errorMessage != null) ...[
+          Text(
+            errorMessage!,
+            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+        ],
+
         Align(
           alignment: Alignment.centerRight,
           child: GestureDetector(
             onTap: isLoading
                 ? null
                 : () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (_) => const ForgotPasswordPage(),
-              //   ),
-              // );ss
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ForgotPasswordPage(),
+                ),
+              );
             },
             child: Text(
               'Lupa Password?',
@@ -163,6 +214,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
         const SizedBox(height: 32),
+
         CustomButton(
           text: 'Masuk',
           isLoading: isLoading,

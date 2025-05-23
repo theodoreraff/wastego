@@ -1,239 +1,329 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:provider/provider.dart';
+import 'package:wastego/core/providers/profile_provider.dart';
 import 'package:wastego/widgets/custom_button.dart';
 
-class ProfilePage extends StatelessWidget {
+/// A page displaying and allowing editing of user profile information.
+/// It fetches user data, supports avatar updates, and allows editing of name and phone number.
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
-  Future<void> _logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStateMixin {
+  bool _isUpdatingAvatar = false;
+  late final AnimationController _avatarButtonController;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Fetch profile data after the first frame is rendered.
+      final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+      profileProvider.fetchProfile();
+    });
+    _avatarButtonController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+      lowerBound: 0.9,
+      upperBound: 1.0,
+      value: 1.0,
+    );
+  }
+
+  @override
+  void dispose() {
+    _avatarButtonController.dispose();
+    super.dispose();
+  }
+
+  /// Handles the avatar tap, triggering an animation and avatar update.
+  Future<void> _onAvatarTap(ProfileProvider profile) async {
+    await _avatarButtonController.reverse();
+    await _avatarButtonController.forward();
+    setState(() => _isUpdatingAvatar = true);
+    await profile.updateAvatar();
+    setState(() => _isUpdatingAvatar = false);
+  }
+
+  /// Shows a dialog for editing profile information (name, phone number).
+  void _showEditDialog(
+      BuildContext context,
+      String label,
+      String initialValue,
+      Future<void> Function(String) onSave,
+      String subtitle,
+      ) {
+    final controller = TextEditingController(text: initialValue);
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        final textTheme = Theme.of(context).textTheme;
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          elevation: 8,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Ubah $label', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 12),
+                Text(subtitle, style: textTheme.bodyMedium?.copyWith(color: Colors.grey[700])),
+                const SizedBox(height: 20),
+                Form(
+                  key: formKey,
+                  child: TextFormField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: label,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xFF003D3D), width: 2),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return '$label tidak boleh kosong';
+                      }
+                      if (label == 'No. HP' && !RegExp(r'^\+?[0-9]{7,15}$').hasMatch(value)) {
+                        return 'Masukkan nomor telepon yang valid';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      style: TextButton.styleFrom(foregroundColor: Colors.grey[600]),
+                      child: const Text('Batal'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF003D3D),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      onPressed: () async {
+                        if (formKey.currentState?.validate() ?? false) {
+                          await onSave(controller.text.trim());
+                          if (context.mounted) Navigator.pop(context);
+                        }
+                      },
+                      child: const Text('Simpan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final profile = Provider.of<ProfileProvider>(context);
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
     return Scaffold(
-      body: SafeArea(
-        child: Column(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          'Profil',
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: const Color(0xFF003D3D),
+      ),
+      body: profile.isLoading
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF003D3D)))
+          : RefreshIndicator(
+        color: const Color(0xFF003D3D),
+        onRefresh: () async => profile.fetchProfile(),
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
           children: [
-            // Banner
-            Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                const _ProfileBanner(),
-                Positioned(
-                  bottom: -30,
-                  child: CircleAvatar(
-                    radius: 70,
-                    backgroundColor: Colors.white,
-                    child: const CircleAvatar(
-                      radius: 60,
-                      backgroundImage: AssetImage('assets/images/profile.png'),
+            Center(
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF003D3D).withOpacity(0.3),
+                          blurRadius: 20,
+                          spreadRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 72,
+                      backgroundColor: Colors.grey[100],
+                      child: ClipOval(
+                        child: profile.avatarUrl.isNotEmpty
+                            ? Image.network(
+                          profile.avatarUrl,
+                          width: 140,
+                          height: 140,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.person, size: 90, color: Colors.grey),
+                        )
+                            : const Icon(Icons.person, size: 90, color: Colors.grey),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            const Text(
-              'WasteHeroes User',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              'Surabaya, Jawa Timur',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const Text(
-              'ID No: BN3123510308',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
-
-            // Logout Button
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 12,
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: ScaleTransition(
+                      scale: _avatarButtonController,
+                      child: Material(
+                        color: const Color(0xFF003D3D),
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(30),
+                          onTap: _isUpdatingAvatar ? null : () => _onAvatarTap(profile),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: _isUpdatingAvatar
+                                ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: Colors.white,
+                              ),
+                            )
+                                : const Icon(Icons.camera_alt, color: Colors.white, size: 26),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              child: CustomButton(
-                text: 'Keluar',
-                onPressed: () => _logout(context),
-                backgroundColor: const Color(0xFFB8FF00),
-                textColor: Colors.black,
-                isLoading: false,
+            ),
+            const SizedBox(height: 36),
+            Card(
+              color: const Color(0xFFFAFFDF),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              elevation: 6,
+              child: Column(
+                children: [
+                  _buildInfoTile(
+                    icon: Icons.person,
+                    iconColor: const Color(0xFF003D3D),
+                    label: 'Nama',
+                    subtitle: 'Hai, siapa namamu?',
+                    value: profile.username.isNotEmpty ? profile.username : '-',
+                    onEdit: () => _showEditDialog(
+                      context,
+                      'Nama',
+                      profile.username,
+                      profile.updateUsername,
+                      'Isi namamu di sini',
+                    ),
+                  ),
+                  const Divider(color: Colors.grey, height: 0),
+                  _buildInfoTile(
+                    icon: Icons.phone,
+                    iconColor: const Color(0xFF003D3D),
+                    label: 'No. HP',
+                    subtitle: 'Nomor HP untuk notifikasi penting',
+                    value: profile.phone.isNotEmpty ? profile.phone : '-',
+                    onEdit: () => _showEditDialog(
+                      context,
+                      'No. HP',
+                      profile.phone,
+                      profile.updatePhone,
+                      'Masukkan nomor telepon yang aktif',
+                    ),
+                  ),
+                  const Divider(color: Colors.grey, height: 0),
+                  _buildInfoTile(
+                    icon: Icons.badge,
+                    iconColor: const Color(0xFF003D3D),
+                    label: 'ID Pengguna',
+                    subtitle: 'ID unik kamu (tidak bisa diubah)',
+                    value: profile.userId.isNotEmpty ? profile.userId : '-',
+                    onEdit: null, // User ID is not editable.
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: 50),
+            CustomButton(
+              text: 'Keluar', // Logout button.
+              backgroundColor: const Color(0xFF003D3D),
+              textColor: const Color(0xFFB8FF00),
+              onPressed: () async {
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                }
+              },
+              isLoading: false,
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class _ProfileBanner extends StatelessWidget {
-  const _ProfileBanner();
-
-  // Menampilkan BottomSheet dan Dialog
-  void _showSharePopup(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  /// Helper widget to build a consistent information tile for profile details.
+  Widget _buildInfoTile({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required String subtitle,
+    required String value,
+    VoidCallback? onEdit,
+  }) {
+    final textTheme = Theme.of(context).textTheme;
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      leading: CircleAvatar(
+        radius: 20,
+        backgroundColor: iconColor.withOpacity(0.15),
+        child: Icon(icon, color: iconColor),
       ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.share, size: 48, color: Colors.green),
-              const SizedBox(height: 16),
-              const Text(
-                'Bagikan WasteHeroes!',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Ajak temanmu jadi pahlawan lingkungan 🌱',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black54),
-              ),
-              const SizedBox(height: 24),
-              CustomButton(
-                text: 'Bagikan Sekarang',  // Tambahkan teks yang sesuai
-                icon: Icons.send,
-                backgroundColor: const Color(0xFFB8FF00),
-                textColor: Colors.black,
-                isLoading: false,
-                onPressed: () async {
-                  Navigator.pop(context); // tutup popup
-                  final box = context.findRenderObject() as RenderBox?;
-                  try {
-                    await SharePlus.instance.share(
-                      ShareParams(
-                        text:
-                        'Hai! Cek aplikasi keren WasteHeroes ini. Yuk jadi pahlawan lingkungan! 🌱🌍\n\nDownload sekarang dan mulai ubah dunia: [link aplikasi]',
-                        sharePositionOrigin: box!.localToGlobal(Offset.zero) &
-                        box.size,
-                      ),
-                    );
-                  } catch (e) {
-                    // Menampilkan Dialog ketika share gagal dengan animasi dan desain menarik
-                    _showFailureDialog(context);
-                  }
-                },
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Batal'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // Function untuk menampilkan dialog error dengan desain animasi
-  void _showFailureDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AnimatedOpacity(
-          opacity: 1.0,
-          duration: const Duration(milliseconds: 300),
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: const Text(
-              'Oh No!',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                  size: 48,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Gagal membagikan aplikasi.\nCoba lagi nanti.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black54),
-                ),
-                const SizedBox(height: 20),
-                CustomButton(
-                  text: 'Tutup',
-                  textColor: Colors.white,
-                  isLoading: false,
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 4,
-        clipBehavior: Clip.antiAlias,
-        child: SizedBox(
-          width: double.infinity,
-          height: 168,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: SvgPicture.asset(
-                  'assets/images/banner.svg',
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topLeft,
-                ),
-              ),
-              Positioned(
-                top: 8,
-                left: 8,
-                child: IconButton(
-                  tooltip: 'Kembali',
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Builder(
-                  builder: (context) {
-                    return IconButton(
-                      tooltip: 'Bagikan aplikasi',
-                      icon: const Icon(Icons.share, color: Colors.white),
-                      onPressed: () => _showSharePopup(context),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+      title: Text(
+        label,
+        style: textTheme.titleMedium?.copyWith(
+            color: Colors.grey[800], fontWeight: FontWeight.w700, letterSpacing: 0.5),
       ),
+      subtitle: Text(
+        subtitle,
+        style: textTheme.bodyMedium?.copyWith(
+            color: Colors.grey[600], fontWeight: FontWeight.w500, letterSpacing: 0.25),
+      ),
+      trailing: onEdit != null
+          ? IconButton(
+        icon: Icon(Icons.edit, color: iconColor),
+        onPressed: onEdit,
+        tooltip: 'Ubah $label',
+      )
+          : null,
+      isThreeLine: true,
+      dense: false,
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'components/home_top_section.dart';
 import 'components/home_stats.dart';
 import 'components/eco_tips_carousel.dart';
@@ -60,7 +59,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 5),
 
             // Waste stats
-            const HomeStats(totalSampah: 155),
+            const HomeStats(totalSampah: 0),
 
             // Carousel of eco tips
             const EcoTipsCarousel(),

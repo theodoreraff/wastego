@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+/// A custom bottom navigation bar with animated icons and labels.
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -13,6 +14,7 @@ class BottomNavBar extends StatelessWidget {
 
   static const Color mainColor = Color(0xFF003539);
 
+  /// Helper to create a color with a specific opacity.
   Color _withOpacity(Color color, double opacity) {
     return color.withAlpha((opacity * 255).round());
   }
@@ -25,7 +27,7 @@ class BottomNavBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
               blurRadius: 20,
@@ -62,12 +64,13 @@ class BottomNavBar extends StatelessWidget {
     );
   }
 
+  /// Builds an individual item for the bottom navigation bar with animation.
   BottomNavigationBarItem _buildNavItem(
-    IconData icon,
-    String label,
-    int currentIndex,
-    int index,
-  ) {
+      IconData icon,
+      String label,
+      int currentIndex,
+      int index,
+      ) {
     final isSelected = currentIndex == index;
 
     return BottomNavigationBarItem(
@@ -79,10 +82,7 @@ class BottomNavBar extends StatelessWidget {
             width: isSelected ? 36 : 32,
             height: isSelected ? 36 : 32,
             decoration: BoxDecoration(
-              color:
-                  isSelected
-                      ? _withOpacity(mainColor, 0.15)
-                      : Colors.transparent,
+              color: isSelected ? _withOpacity(mainColor, 0.15) : Colors.transparent,
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -105,7 +105,7 @@ class BottomNavBar extends StatelessWidget {
           ),
         ],
       ),
-      label: '',
+      label: '', // Label is handled by the custom icon column.
     );
   }
 }

@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import 'package:wastego/views/recycle/request_pickup_page.dart';
 import 'package:wastego/views/recycle/info_page.dart';
 import '../../widgets/custom_button.dart';
 
+/// A page where users can input the weight of different recyclable items,
+/// get an estimated exchange value, and request a pickup.
 class RecyclePage extends StatefulWidget {
   const RecyclePage({super.key});
 
@@ -12,6 +18,7 @@ class RecyclePage extends StatefulWidget {
 }
 
 class _RecyclePageState extends State<RecyclePage> {
+  // Stores the current weight for each item.
   final Map<String, double> itemWeights = {
     'Kertas': 0.0,
     'Botol': 0.0,
@@ -19,6 +26,7 @@ class _RecyclePageState extends State<RecyclePage> {
     'Kardus': 0.0,
   };
 
+  // Prices per kg for each item.
   final Map<String, double> itemPricesPerKg = {
     'Kertas': 1200.0,
     'Botol': 1800.0,
@@ -26,6 +34,7 @@ class _RecyclePageState extends State<RecyclePage> {
     'Kardus': 1300.0,
   };
 
+  // Icons for each item.
   final Map<String, IconData> itemIcons = {
     'Kertas': LucideIcons.file,
     'Botol': LucideIcons.beer,
@@ -33,46 +42,63 @@ class _RecyclePageState extends State<RecyclePage> {
     'Kardus': LucideIcons.box,
   };
 
+  // Text controllers for inputting item weights.
   final Map<String, TextEditingController> controllers = {};
+  late SharedPreferences prefs;
+  String? idToken; // User authentication token.
 
   @override
   void initState() {
     super.initState();
+    initPreferences();
+    // Initialize a TextEditingController for each item.
     for (var key in itemWeights.keys) {
       controllers[key] = TextEditingController();
     }
   }
 
+  /// Initializes SharedPreferences and loads saved item weights and user token.
+  Future<void> initPreferences() async {
+    prefs = await SharedPreferences.getInstance();
+    idToken = prefs.getString('idToken'); // Load token.
+
+    setState(() {
+      // Load saved weights or default to 0.0.
+      for (var key in itemWeights.keys) {
+        double weight = prefs.getDouble('weight_$key') ?? 0.0;
+        itemWeights[key] = weight;
+        controllers[key]?.text = weight > 0 ? weight.toString() : '';
+      }
+    });
+  }
+
   @override
   void dispose() {
+    // Dispose all TextEditingControllers.
     for (var controller in controllers.values) {
       controller.dispose();
     }
     super.dispose();
   }
 
+  /// Displays an alert dialog for various warnings.
   void showAlert(String action) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Tunggu dulu!',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          title: const Text('Tunggu dulu!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           content: Text(
             action == 'estimasi'
                 ? 'Masukkan berat barang untuk melihat estimasi nilai tukar.'
                 : 'Belum ada barang yang ditambahkan untuk dijemput, ayo isi beratnya!',
-            style:
-            const TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Oke',
-                  style:
-                  TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-              style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF003D3D)),
+              style: TextButton.styleFrom(foregroundColor: const Color(0xFF003D3D)),
+              child: const Text('Oke', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             ),
           ],
         );
@@ -80,9 +106,9 @@ class _RecyclePageState extends State<RecyclePage> {
     );
   }
 
+  /// Shows a bottom sheet with the estimated value of the selected items.
   void showEstimationSheet() {
-    final totalKg =
-    itemWeights.values.fold(0.0, (sum, weight) => sum + weight);
+    final totalKg = itemWeights.values.fold(0.0, (sum, weight) => sum + weight);
     if (totalKg == 0) {
       showAlert('estimasi');
       return;
@@ -100,8 +126,7 @@ class _RecyclePageState extends State<RecyclePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Center(
-              child: Text('Estimasi Penukaran',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              child: Text('Estimasi Penukaran', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             ),
             const SizedBox(height: 12),
             ...itemWeights.entries
@@ -114,13 +139,11 @@ class _RecyclePageState extends State<RecyclePage> {
                   children: [
                     Text(
                       '${entry.key} (${entry.value.toStringAsFixed(2)} kg)',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                     Text(
                       'Rp${(entry.value * itemPricesPerKg[entry.key]!).toStringAsFixed(0)}',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -130,13 +153,10 @@ class _RecyclePageState extends State<RecyclePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Total Estimasi:',
-                    style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text('Total Estimasi:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Text(
                   'Rp${itemWeights.entries.map((e) => e.value * itemPricesPerKg[e.key]!).reduce((a, b) => a + b).toStringAsFixed(0)}',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -151,12 +171,65 @@ class _RecyclePageState extends State<RecyclePage> {
     );
   }
 
+  /// Sends a request to the backend to get a pickup estimate or initiate a pickup.
+  Future<void> sendPickupRequest() async {
+    final totalKg = itemWeights.values.fold(0.0, (sum, weight) => sum + weight);
+    if (totalKg == 0) {
+      showAlert('penjemputan');
+      return;
+    }
+
+    if (idToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Token tidak ditemukan. Silakan login ulang.')),
+      );
+      return;
+    }
+
+    // Prepare request body with waste details.
+    Map<String, dynamic> requestBody = {
+      'wasteDetails': itemWeights.map((key, value) => MapEntry(key.toLowerCase(), value.toInt())),
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://fahmi.led.my.id/api/waste-pickup/estimate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $idToken',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Navigate to the RequestPickupPage on success.
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => RequestPickupPage(itemWeights: itemWeights),
+            ),
+          );
+        }
+      } else {
+        // Show error from the server.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mengirim permintaan: ${response.reasonPhrase}')),
+        );
+      }
+    } catch (e) {
+      // Show general error message.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recycle',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+        title: const Text('Recycle', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
         leading: const BackButton(),
         scrolledUnderElevation: 0,
         actions: [
@@ -165,8 +238,7 @@ class _RecyclePageState extends State<RecyclePage> {
             child: IconButton(
               icon: const Icon(Icons.info_outline, size: 28),
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const InfoPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const InfoPage()));
               },
             ),
           ),
@@ -199,11 +271,11 @@ class _RecyclePageState extends State<RecyclePage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
+              // Dynamically build input fields for each recyclable item.
               ...itemWeights.keys.map((key) {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(color: Colors.grey.shade300),
@@ -216,8 +288,7 @@ class _RecyclePageState extends State<RecyclePage> {
                       Expanded(
                         child: Text(
                           key,
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ),
                       SizedBox(
@@ -250,11 +321,13 @@ class _RecyclePageState extends State<RecyclePage> {
                                 isDense: true,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               ),
-                              onChanged: (value) {
+                              onChanged: (value) async {
+                                double parsed = double.tryParse(value) ?? 0.0;
                                 setState(() {
-                                  itemWeights[key] = double.tryParse(value) ?? 0.0;
+                                  itemWeights[key] = parsed;
                                 });
                                 setInnerState(() {});
+                                await prefs.setDouble('weight_$key', parsed); // Save weight to SharedPreferences.
                               },
                             );
                           },
@@ -278,21 +351,7 @@ class _RecyclePageState extends State<RecyclePage> {
                 backgroundColor: const Color(0xFF003D3D),
                 textColor: const Color(0xFFB8FF00),
                 icon: Icons.local_shipping_outlined,
-                onPressed: () {
-                  final totalKg =
-                  itemWeights.values.fold(0.0, (sum, weight) => sum + weight);
-                  if (totalKg == 0) {
-                    showAlert('penjemputan');
-                    return;
-                  }
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          RequestPickupPage(itemWeights: itemWeights),
-                    ),
-                  );
-                },
+                onPressed: sendPickupRequest,
               ),
             ],
           ),

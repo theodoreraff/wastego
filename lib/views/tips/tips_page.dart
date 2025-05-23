@@ -4,6 +4,8 @@ import 'package:wastego/views/tips/detail_tips.dart';
 import 'package:wastego/views/tips/menu_tips.dart';
 import 'package:wastego/widgets/custom_button.dart';
 
+/// A page displaying environmental tips, featuring an expert's introduction
+/// and a list of tips with a "More" button.
 class TipsPage extends StatelessWidget {
   const TipsPage({super.key});
 
@@ -36,28 +38,27 @@ class TipsPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView.builder(
-          itemCount: tipsList.length + 2,
+          itemCount: tipsList.length + 2, // Account for header and "More" button.
           itemBuilder: (context, index) {
             if (index == 0) {
-              return _headerSection(context);
+              return _headerSection(context); // Display the expert's introduction.
             } else if (index <= tipsList.length) {
-              final Tips tips = tipsList[index - 1];
+              final Tips tips = tipsList[index - 1]; // Get tip from list.
               return GestureDetector(
-                onTap:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailTipsScreen(tipsItem: tips),
-                      ),
-                    ),
-                child: _tipsItem(tips),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailTipsScreen(tipsItem: tips),
+                  ),
+                ),
+                child: _tipsItem(tips), // Display individual tip item.
               );
             } else if (index == tipsList.length + 1) {
               return Column(
                 children: [
                   const SizedBox(height: 20),
                   CustomButton(
-                    text: 'Lebih Banyak',
+                    text: 'Lebih Banyak', // "More" button.
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -73,7 +74,7 @@ class TipsPage extends StatelessWidget {
                 ],
               );
             } else {
-              return const SizedBox.shrink();
+              return const SizedBox.shrink(); // Fallback for unexpected index.
             }
           },
         ),
@@ -81,6 +82,7 @@ class TipsPage extends StatelessWidget {
     );
   }
 
+  /// Builds the header section with expert information.
   Widget _headerSection(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -140,6 +142,7 @@ class TipsPage extends StatelessWidget {
     );
   }
 
+  /// Builds a single tips item card.
   Widget _tipsItem(Tips tipsItem) {
     return Card(
       color: Colors.white,

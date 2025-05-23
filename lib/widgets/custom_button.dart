@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// A customizable button widget for various UI actions.
+/// Supports custom colors, borders, an optional icon, and a loading state.
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -49,36 +51,34 @@ class CustomButton extends StatelessWidget {
           ),
         ),
         onPressed: isDisabled ? null : onPressed,
-        child:
-            isLoading
-                ? const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                )
-                : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (icon != null && iconAtStart) ...[
-                      Icon(icon, color: textColor),
-                      const SizedBox(width: 8),
-                    ],
-                    Text(
-                      text,
-                      style:
-                          textStyle ??
-                          TextStyle(
-                            color: textColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    if (icon != null && !iconAtStart) ...[
-                      const SizedBox(width: 8),
-                      Icon(icon, color: textColor),
-                    ],
-                  ],
-                ),
+        child: isLoading
+            ? const CircularProgressIndicator(
+          color: Colors.white,
+          strokeWidth: 2,
+        )
+            : Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null && iconAtStart) ...[
+              Icon(icon, color: textColor),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              text,
+              style: textStyle ??
+                  TextStyle(
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            if (icon != null && !iconAtStart) ...[
+              const SizedBox(width: 8),
+              Icon(icon, color: textColor),
+            ],
+          ],
+        ),
       ),
     );
   }

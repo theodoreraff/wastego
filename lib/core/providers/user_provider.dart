@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';
 
-class UserProvider with ChangeNotifier {
-  String _userName;
-  int _points;
-  String _userId;
+class UserProvider extends ChangeNotifier {
+  UserModel? _user;
 
-  UserProvider(this._userName, this._points, this._userId);
+  UserModel? get user => _user;
 
-  String get userName => _userName;
-  int get points => _points;
-  String get userId => _userId;
+  bool get isLoggedIn => _user != null;
 
-  void updateUser(String userName, int points, String userId) {
-    _userName = userName;
-    _points = points;
-    _userId = userId;
+  void setUser(UserModel user) {
+    _user = user;
+    notifyListeners();
+  }
+
+  void clearUser() {
+    _user = null;
     notifyListeners();
   }
 }

@@ -1,36 +1,30 @@
 import 'package:flutter/material.dart';
-
-import '../views/auth/login_page.dart';
-import '../views/auth/register_page.dart';
-import '../views/auth/forgot_password_page.dart';       // import forgot password
-import '../views/auth/otp_verification_page.dart';      // import otp verification
-import '../views/auth/reset_password_page.dart';        // import reset password
-import '../views/home/home_page.dart';
-import '../views/schedule/schedule_page.dart';
-import '../views/recycle/recycle_page.dart';
-import '../views/events/events_page.dart';
-import '../views/donate/donate_page.dart';
-import '../views/blog/blog_page.dart';
-import '../views/tips/tips_page.dart';
-import '../views/more/more_page.dart';
-import '../views/settings/profile_page.dart';
-import '../views/notification/notification_page.dart';
-import '../views/support/help_page.dart';
-import '../views/poin/poin_page.dart';
-import '../views/onboarding/onboarding_page.dart';
-import '../views/splash/splash_page.dart';
-
-import '../views/onboarding/onboarding_page_step1.dart';
-import '../views/onboarding/onboarding_page_step2.dart';
-import '../views/onboarding/onboarding_screen1.dart';
+import 'package:wastego/views/auth/login_page.dart';
+import 'package:wastego/views/auth/register_page.dart';
+import 'package:wastego/views/auth/forgot_password_page.dart';
+import 'package:wastego/views/auth/otp_verification_page.dart';
+import 'package:wastego/views/auth/reset_password_page.dart';
+import 'package:wastego/views/home/home_page.dart';
+import 'package:wastego/views/schedule/schedule_page.dart';
+import 'package:wastego/views/recycle/recycle_page.dart';
+import 'package:wastego/views/events/events_page.dart';
+import 'package:wastego/views/donate/donate_page.dart';
+import 'package:wastego/views/blog/blog_page.dart';
+import 'package:wastego/views/tips/tips_page.dart';
+import 'package:wastego/views/more/more_page.dart';
+import 'package:wastego/views/settings/profile_page.dart';
+import 'package:wastego/views/notification/notification_page.dart';
+import 'package:wastego/views/support/help_page.dart';
+import 'package:wastego/views/poin/poin_page.dart';
+import 'package:wastego/views/onboarding/onboarding_page.dart';
 
 class AppRoutes {
   static const String splash = '/splash';
   static const String login = '/';
   static const String register = '/register';
-  static const String forgotPassword = '/forgot-password';          // baru
-  static const String otpVerification = '/verify-otp';               // baru
-  static const String resetPassword = '/reset-password';             // baru
+  static const String forgotPassword = '/forgot-password';
+  static const String otpVerification = '/verify-otp';
+  static const String resetPassword = '/reset-password';
   static const String home = '/home';
   static const String schedule = '/schedule';
   static const String recycle = '/recycle';
@@ -44,38 +38,22 @@ class AppRoutes {
   static const String help = '/help';
   static const String points = '/points';
   static const String onboarding = '/onboarding';
-
   static const String onboardingStep1 = '/onboardingStep1';
   static const String onboardingStep2 = '/onboardingStep2';
   static const String onboardingScreen1 = '/onboardingScreen1';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case splash:
-        return MaterialPageRoute(builder: (_) => SplashPage());
       case login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterPage());
-
-      // case forgotPassword:                                               // baru
-      //   return MaterialPageRoute(builder: (_) => const ForgotPasswordPage());
-      //
-      // case otpVerification:                                               // baru
-      //   final args = settings.arguments as Map<String, dynamic>;
-      //   return MaterialPageRoute(
-      //     builder: (_) => OtpVerificationPage(email: args['email']),
-      //   );
-      //
-      // case resetPassword:                                                 // baru
-      //   final args = settings.arguments as Map<String, dynamic>;
-      //   return MaterialPageRoute(
-      //     builder: (_) => ResetPasswordPage(
-      //       email: args['email'],
-      //       otp: args['otp'],
-      //     ),
-      //   );
-
+      case forgotPassword:
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordPage());
+      case otpVerification:
+        return MaterialPageRoute(builder: (_) => OtpVerificationPage());
+      case resetPassword:
+        return MaterialPageRoute(builder: (_) => ResetPasswordPage());
       case home:
         return MaterialPageRoute(builder: (_) => const HomePage());
       case schedule:
@@ -93,7 +71,7 @@ class AppRoutes {
       case more:
         return MaterialPageRoute(builder: (_) => const MorePage());
       case profile:
-        return MaterialPageRoute(builder: (_) => const ProfilePage());
+        return MaterialPageRoute(builder: (_) => ProfilePage());
       case notification:
         return MaterialPageRoute(builder: (_) => const NotificationsPage());
       case help:
@@ -103,14 +81,10 @@ class AppRoutes {
       case onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingPage());
       case onboardingStep1:
-        return MaterialPageRoute(builder: (_) => const OnboardingPageStep1());
-      case onboardingStep2:
-        return MaterialPageRoute(builder: (_) => const OnboardingPageStep2());
-      case onboardingScreen1:
-        return MaterialPageRoute(builder: (_) => const OnboardingScreen1());
 
       default:
         return MaterialPageRoute(builder: (_) => const LoginPage());
     }
   }
 }
+

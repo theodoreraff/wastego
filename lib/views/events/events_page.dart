@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wastego/core/providers/event_provider.dart';
 import 'package:wastego/core/models/event_model.dart';
+import 'package:wastego/core/providers/event_provider.dart';
 
+/// A page displaying a list of environmental events. Users can filter events
+/// and RSVP for them.
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
 
@@ -12,7 +14,32 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  String selectedStatus = 'Ongoing';
+  String selectedStatus = 'Ongoing'; // Filter for event status.
+  bool _isLoading = false; // Manages loading state for event data.
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEvents(); // Load events when the page initializes.
+  }
+
+  /// Loads events from the [EventProvider] and handles loading state.
+  Future<void> _loadEvents() async {
+    setState(() => _isLoading = true);
+    try {
+      await Provider.of<EventProvider>(context, listen: false).loadEvents();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load events: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,62 +49,53 @@ class _EventsPageState extends State<EventsPage> {
         centerTitle: false,
         leading: const BackButton(),
       ),
-      body: FutureBuilder(
-        future: Provider.of<EventProvider>(context, listen: false).loadEvents(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator()) // Show loading indicator.
+          : Consumer<EventProvider>(
+        builder: (context, provider, _) {
+          final events = provider.events;
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                "Terjadi kesalahan: ${snapshot.error}",
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
+          // Filter events based on selected status (currently only 'Ongoing' shows all).
+          final filteredEvents = events.where((event) {
+            if (selectedStatus == 'Ongoing') return true; // Shows all events for 'Ongoing' filter.
+            if (selectedStatus == 'Completed') return false; // Placeholder for 'Completed' filter.
+            return true; // Default to showing all.
+          }).toList();
 
-          return Consumer<EventProvider>(
-            builder: (context, provider, _) {
-              final events = provider.events ?? [];
-
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildFilterDropdown(),
-                    const SizedBox(height: 16),
-                    if (events.isEmpty)
-                      const Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 40),
-                          child: Text(
-                            "Tidak ada event tersedia.",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      )
-                    else
-                      ...events.map(_buildEventItem).toList(),
-                  ],
-                ),
-              );
-            },
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildFilterDropdown(), // Dropdown to select event status.
+                const SizedBox(height: 16),
+                if (filteredEvents.isEmpty)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 40),
+                      child: Text(
+                        "No events available.",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  )
+                else
+                  ...filteredEvents.map(_buildEventItem).toList(), // Display filtered events.
+              ],
+            ),
           );
         },
       ),
     );
   }
 
-  // Dropdown to filter events by status (Ongoing, Completed, Upcoming)
+  /// Builds the dropdown for filtering events by status.
   Widget _buildFilterDropdown() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          "Semua Event:",
+          "All Events:",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         Container(
@@ -91,20 +109,15 @@ class _EventsPageState extends State<EventsPage> {
             child: DropdownButton<String>(
               value: selectedStatus,
               icon: const Icon(Icons.keyboard_arrow_down),
-              items: ['Ongoing', 'Completed', 'Upcoming'].map((String value) {
+              items: ['Ongoing', 'Completed'].map((value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(
-                    value,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  ),
+                  child: Text(value, style: const TextStyle(fontSize: 14)),
                 );
               }).toList(),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    selectedStatus = newValue;
-                  });
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => selectedStatus = value);
                 }
               },
             ),
@@ -114,7 +127,7 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  // Event item widget to display each event
+  /// Builds a single event item card.
   Widget _buildEventItem(Event event) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -142,7 +155,7 @@ class _EventsPageState extends State<EventsPage> {
             ),
             alignment: Alignment.center,
             child: Text(
-              event.date,
+              event.date, // Display event date.
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
@@ -152,12 +165,12 @@ class _EventsPageState extends State<EventsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  event.title,
+                  event.title, // Event title.
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "${event.time} • ${event.location}",
+                  "${event.time} • ${event.location}", // Event time and location.
                   style: const TextStyle(fontSize: 13, color: Colors.grey),
                 ),
               ],
@@ -174,16 +187,30 @@ class _EventsPageState extends State<EventsPage> {
               ),
             ),
             onPressed: () async {
-              final url = event.rsvpUrl;  // The RSVP URL for the event
-              if (await canLaunchUrl(Uri.parse(url))) {
-                // Try to launch the URL in the external application
-                await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+              final url = event.rsvpUrl.trim();
+              if (url.isNotEmpty) {
+                final uri = Uri.parse(url);
+                try {
+                  // Launch the RSVP URL in an external application.
+                  final success = await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  if (!success && mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Could not open browser.')),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to open link: $e')),
+                    );
+                  }
+                }
               } else {
-                // Show error if URL can't be opened
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Tidak dapat membuka tautan.')),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('RSVP URL is empty.')),
+                  );
+                }
               }
             },
             child: const Text("RSVP"),

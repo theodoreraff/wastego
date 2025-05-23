@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:wastego/widgets/custom_button.dart';
+import 'package:share_plus/share_plus.dart';
 
+/// A page displaying the user's current points balance and options to earn or redeem points.
+/// Currently, it shows a message for zero points and encourages recycling.
 class PointsPage extends StatelessWidget {
   const PointsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width and height to dynamically adjust padding/margins
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
+    final int totalPoints = 0; // Placeholder for user's total points.
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Points'),
+        title: const Text('Poin Kamu'),
       ),
       body: SafeArea(
         child: Padding(
@@ -22,7 +25,6 @@ class PointsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Icon/Illustration related to points
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: screenHeight * 0.05),
                   child: SvgPicture.asset(
@@ -31,9 +33,9 @@ class PointsPage extends StatelessWidget {
                     fit: BoxFit.contain,
                   ),
                 ),
-                const Text(
-                  'Your Points: 1000',
-                  style: TextStyle(
+                Text(
+                  'Kamu belum punya poin nih!',
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -42,7 +44,7 @@ class PointsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Amazing! You have collected a lot of points! 🎉\nKeep collecting more and get exciting rewards!',
+                  '🌱 Yuk, mulai daur ulang dan kumpulkan poin pertamamu. Setiap aksi kecilmu buat bumi makin bersih, lho!',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.black54,
@@ -50,15 +52,17 @@ class PointsPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 28),
-
-                // Action Buttons for Redeem and Invite Friends
                 Row(
                   children: [
                     Expanded(
                       child: CustomButton(
-                        text: 'Redeem Points Now',
+                        text: 'Tukar Poin',
                         onPressed: () {
-                          // TODO: Implement point redemption functionality
+                          // Show a snackbar if the user has no points to redeem.
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Wah, kamu belum punya poin untuk ditukar nih!')),
+                          );
                         },
                         backgroundColor: const Color(0xFF003539),
                         textColor: const Color(0xFFAFEE00),
@@ -67,9 +71,13 @@ class PointsPage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: CustomButton(
-                        text: 'Invite Friends',
+                        text: 'Ajak Teman',
                         onPressed: () {
-                          // TODO: Implement functionality to invite friends and earn bonus points
+                          // Share an invitation message to friends.
+                          Share.share(
+                            'Ayo daur ulang bareng Wastego! Dapatkan poin bonus dengan mengajak teman kamu. Yuk, cek aplikasinya di: https://wastego.app.link/invite',
+                            subject: 'Undangan Wastego',
+                          );
                         },
                         backgroundColor: Colors.white,
                         textColor: const Color(0xFF003539),
@@ -79,89 +87,10 @@ class PointsPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 32),
-
-                // Points History Section
-                Row(
-                  children: [
-                    const Text(
-                      'Points History',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const Spacer(),
-                    DropdownButton<String>(
-                      value: '2024',
-                      onChanged: (String? newValue) {
-                        // Handle year selection
-                      },
-                      items: <String>['2024', '2023', '2022', '2021']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Points History List
-                Card(
-                  color: Colors.white,
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    title: const Text(
-                      'Recycle Waste',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: const Text('Earned 100 Points'),
-                    trailing: const Icon(
-                      Icons.chevron_right,
-                      color: Color(0xFF003539),
-                    ),
-                    onTap: () {
-                      // Handle tap for more details
-                    },
-                  ),
-                ),
-                Card(
-                  color: Colors.white,
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    title: const Text(
-                      'Participation in "Waste Recycling" Event',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: const Text('Earned 500 Points'),
-                    trailing: const Icon(
-                      Icons.chevron_right,
-                      color: Color(0xFF003539),
-                    ),
-                    onTap: () {
-                      // Handle tap for more details
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Footer
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Text(
-                    'Want more points? Try new challenges or share Wastego with your friends!',
+                    '♻️ Bagikan semangat Wastego! Ajak teman dan keluarga buat jadi pahlawan daur ulang juga!',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.black54,

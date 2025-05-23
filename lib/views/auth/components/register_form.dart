@@ -10,6 +10,7 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -38,6 +39,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -45,9 +47,15 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   Future<void> _handleRegister() async {
+    final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
+
+    if (username.isEmpty) {
+      _showError('Username tidak boleh kosong.');
+      return;
+    }
 
     if (email.isEmpty) {
       _showError('Email tidak boleh kosong.');
@@ -55,7 +63,7 @@ class _RegisterFormState extends State<RegisterForm> {
     }
 
     if (!_isValidEmail(email)) {
-      _showError('Format email tidak valid. Harus mengandung "@" dan tidak ada spasi.');
+      _showError('Format email tidak valid.');
       return;
     }
 
@@ -93,13 +101,14 @@ class _RegisterFormState extends State<RegisterForm> {
 
     try {
       final result = await ApiService.registerUser(
+        username: username,
         email: email,
         password: password,
         confirmPassword: confirmPassword,
       );
 
       _showSuccess('Registrasi berhasil!');
-      Navigator.pushReplacementNamed(context, '/onboardingScreen1');
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       _showError('Registrasi gagal: ${e.toString()}');
     } finally {
@@ -109,75 +118,90 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 5),
-        TextField(
-          controller: _emailController,
-          decoration: const InputDecoration(
-            hintText: 'Masukkan Email',
-            hintStyle: TextStyle(color: Colors.grey),
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        const Text('Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 5),
-        TextField(
-          controller: _passwordController,
-          obscureText: !_passwordVisible,
-          decoration: InputDecoration(
-            hintText: 'Masukkan Password',
-            hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-            suffixIcon: IconButton(
-              icon: Icon(_passwordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
-              onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Username', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 5),
+          TextField(
+            controller: _usernameController,
+            decoration: const InputDecoration(
+              hintText: 'Masukkan Username',
+              hintStyle: TextStyle(color: Colors.grey),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
             ),
           ),
-        ),
-        const SizedBox(height: 24),
+          const SizedBox(height: 24),
 
-        const Text('Konfirmasi Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 5),
-        TextField(
-          controller: _confirmPasswordController,
-          obscureText: !_confirmPasswordVisible,
-          decoration: InputDecoration(
-            hintText: 'Masukkan Ulang Password',
-            hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-            suffixIcon: IconButton(
-              icon: Icon(_confirmPasswordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
-              onPressed: () => setState(() => _confirmPasswordVisible = !_confirmPasswordVisible),
+          const Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 5),
+          TextField(
+            controller: _emailController,
+            decoration: const InputDecoration(
+              hintText: 'Masukkan Email',
+              hintStyle: TextStyle(color: Colors.grey),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
             ),
           ),
-        ),
-        const SizedBox(height: 5),
+          const SizedBox(height: 24),
 
-        Row(
-          children: [
-            Checkbox(
-              value: _agreeToTerms,
-              onChanged: (value) => setState(() => _agreeToTerms = value ?? false),
+          const Text('Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 5),
+          TextField(
+            controller: _passwordController,
+            obscureText: !_passwordVisible,
+            decoration: InputDecoration(
+              hintText: 'Masukkan Password',
+              hintStyle: const TextStyle(color: Colors.grey),
+              enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+              suffixIcon: IconButton(
+                icon: Icon(_passwordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
+                onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+              ),
             ),
-            const Text('Saya menyetujui syarat dan ketentuan'),
-          ],
-        ),
-        const SizedBox(height: 5),
+          ),
+          const SizedBox(height: 24),
 
-        CustomButton(
-          text: 'Daftar',
-          isLoading: isLoading,
-          onPressed: _agreeToTerms && !isLoading ? _handleRegister : null,
-        ),
-      ],
+          const Text('Konfirmasi Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 5),
+          TextField(
+            controller: _confirmPasswordController,
+            obscureText: !_confirmPasswordVisible,
+            decoration: InputDecoration(
+              hintText: 'Masukkan Ulang Password',
+              hintStyle: const TextStyle(color: Colors.grey),
+              enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+              suffixIcon: IconButton(
+                icon: Icon(_confirmPasswordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
+                onPressed: () => setState(() => _confirmPasswordVisible = !_confirmPasswordVisible),
+              ),
+            ),
+          ),
+          const SizedBox(height: 5),
+
+          Row(
+            children: [
+              Checkbox(
+                value: _agreeToTerms,
+                onChanged: (value) => setState(() => _agreeToTerms = value ?? false),
+              ),
+              const Expanded(child: Text('Saya menyetujui syarat dan ketentuan')),
+            ],
+          ),
+          const SizedBox(height: 5),
+
+          CustomButton(
+            text: 'Daftar',
+            isLoading: isLoading,
+            onPressed: _agreeToTerms && !isLoading ? _handleRegister : null,
+          ),
+        ],
+      ),
     );
   }
 }
