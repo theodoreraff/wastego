@@ -21,6 +21,7 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             GestureDetector(
@@ -80,16 +81,13 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Text(
-                                '${widget.donateItem.formatCurrency(widget.donateItem.targetDonate)} target',
-                              ),
-                              const SizedBox(width: 20),
-                              Text(
-                                '${widget.donateItem.totalUniqueDonors} Contributions',
-                              ),
-                            ],
+
+                          Text(
+                            '${widget.donateItem.formatCurrency(widget.donateItem.targetDonate)} target',
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${widget.donateItem.totalUniqueDonors} Contributions',
                           ),
                         ],
                       ),
@@ -139,7 +137,8 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
                     ),
                   ),

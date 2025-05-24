@@ -30,9 +30,9 @@ class _EventsPageState extends State<EventsPage> {
       await Provider.of<EventProvider>(context, listen: false).loadEvents();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load events: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to load events: $e')));
       }
     } finally {
       if (mounted) {
@@ -48,44 +48,53 @@ class _EventsPageState extends State<EventsPage> {
         title: const Text("Events"),
         centerTitle: false,
         leading: const BackButton(),
+        scrolledUnderElevation: 0,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator()) // Show loading indicator.
-          : Consumer<EventProvider>(
-        builder: (context, provider, _) {
-          final events = provider.events;
+      body:
+          _isLoading
+              ? const Center(
+                child: CircularProgressIndicator(),
+              ) // Show loading indicator.
+              : Consumer<EventProvider>(
+                builder: (context, provider, _) {
+                  final events = provider.events;
 
-          // Filter events based on selected status (currently only 'Ongoing' shows all).
-          final filteredEvents = events.where((event) {
-            if (selectedStatus == 'Ongoing') return true; // Shows all events for 'Ongoing' filter.
-            if (selectedStatus == 'Completed') return false; // Placeholder for 'Completed' filter.
-            return true; // Default to showing all.
-          }).toList();
+                  // Filter events based on selected status (currently only 'Ongoing' shows all).
+                  final filteredEvents =
+                      events.where((event) {
+                        if (selectedStatus == 'Ongoing')
+                          return true; // Shows all events for 'Ongoing' filter.
+                        if (selectedStatus == 'Completed')
+                          return false; // Placeholder for 'Completed' filter.
+                        return true; // Default to showing all.
+                      }).toList();
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildFilterDropdown(), // Dropdown to select event status.
-                const SizedBox(height: 16),
-                if (filteredEvents.isEmpty)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 40),
-                      child: Text(
-                        "No events available.",
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildFilterDropdown(), // Dropdown to select event status.
+                        const SizedBox(height: 16),
+                        if (filteredEvents.isEmpty)
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 40),
+                              child: Text(
+                                "No events available.",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          )
+                        else
+                          ...filteredEvents
+                              .map(_buildEventItem)
+                              .toList(), // Display filtered events.
+                      ],
                     ),
-                  )
-                else
-                  ...filteredEvents.map(_buildEventItem).toList(), // Display filtered events.
-              ],
-            ),
-          );
-        },
-      ),
+                  );
+                },
+              ),
     );
   }
 
@@ -109,12 +118,13 @@ class _EventsPageState extends State<EventsPage> {
             child: DropdownButton<String>(
               value: selectedStatus,
               icon: const Icon(Icons.keyboard_arrow_down),
-              items: ['Ongoing', 'Completed'].map((value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value, style: const TextStyle(fontSize: 14)),
-                );
-              }).toList(),
+              items:
+                  ['Ongoing', 'Completed'].map((value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value, style: const TextStyle(fontSize: 14)),
+                    );
+                  }).toList(),
               onChanged: (value) {
                 if (value != null) {
                   setState(() => selectedStatus = value);
@@ -141,7 +151,7 @@ class _EventsPageState extends State<EventsPage> {
             color: Colors.grey.shade100,
             blurRadius: 4,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -192,7 +202,10 @@ class _EventsPageState extends State<EventsPage> {
                 final uri = Uri.parse(url);
                 try {
                   // Launch the RSVP URL in an external application.
-                  final success = await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  final success = await launchUrl(
+                    uri,
+                    mode: LaunchMode.externalApplication,
+                  );
                   if (!success && mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Could not open browser.')),

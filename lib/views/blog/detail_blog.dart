@@ -31,7 +31,7 @@ class DetailBlogScreen extends StatelessWidget {
                   "$currentNumber.",
                   style: const TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                     fontFamily: 'Poppins',
                   ),
                 ),
@@ -41,7 +41,7 @@ class DetailBlogScreen extends StatelessWidget {
                     stepText,
                     style: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w400,
                       fontFamily: 'Poppins',
                     ),
                   ),
@@ -91,11 +91,14 @@ class DetailBlogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             GestureDetector(
@@ -105,12 +108,17 @@ class DetailBlogScreen extends StatelessWidget {
               child: const Icon(Icons.chevron_left, size: 24),
             ),
             const SizedBox(width: 5),
-            Text(
-              blogItem.title,
-              style: TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
+            Container(
+              width: screenWidth * 0.8,
+              child: Text(
+                blogItem.title,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.048,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                ),
+                softWrap: true, // Pastikan teks boleh wrap
+                overflow: TextOverflow.visible, // Biarkan teks tampil penuh
               ),
             ),
           ],

@@ -45,7 +45,8 @@ class _DonatePageState extends State<DonatePage> {
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: ListView.builder(
-          itemCount: filteredDonateList.length + 1,
+          itemCount:
+              filteredDonateList.isEmpty ? 1 : filteredDonateList.length + 1,
           itemBuilder: (context, index) {
             if (index == 0) {
               return Column(
@@ -121,6 +122,21 @@ class _DonatePageState extends State<DonatePage> {
                     ],
                   ),
                   const SizedBox(height: 8),
+                  if (filteredDonateList.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 40),
+                      child: Center(
+                        child: Text(
+                          "No campaigns available for this status.",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
                 ],
               );
             } else {
@@ -191,11 +207,7 @@ Widget listItem(Donate donateItem) {
         Expanded(
           flex: 2,
           child: Padding(
-            padding: const EdgeInsets.only(
-              top: 12.0,
-              bottom: 12.0,
-              right: 12.0,
-            ),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -204,7 +216,7 @@ Widget listItem(Donate donateItem) {
                   donateItem.title,
                   style: const TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -212,7 +224,7 @@ Widget listItem(Donate donateItem) {
                 Text(
                   donateItem.titleDescription,
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wastego/core/models/blog_model.dart';
 import 'package:wastego/views/blog/detail_blog.dart';
 import 'package:wastego/views/blog/menu_blog.dart';
+import 'package:wastego/widgets/custom_button.dart';
 
 class BlogPage extends StatelessWidget {
   const BlogPage({super.key});
@@ -13,6 +14,7 @@ class BlogPage extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             GestureDetector(
@@ -55,37 +57,18 @@ class BlogPage extends StatelessWidget {
               return Column(
                 children: [
                   const SizedBox(height: 20),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MenuBlogScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFAFEE00),
-                        foregroundColor: const Color(0xFF003539),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                  CustomButton(
+                    text: 'Lebih Banyak', // "More" button.
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MenuBlogScreen(),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Lebih Banyak',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
+                      );
+                    },
+                    backgroundColor: const Color(0xFFAFEE00),
+                    textColor: const Color(0xFF003539),
                   ),
                   const SizedBox(height: 30),
                 ],
@@ -106,7 +89,6 @@ Widget listItem(Blog blogItem) {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
     elevation: 2,
     child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           flex: 1,
@@ -121,20 +103,15 @@ Widget listItem(Blog blogItem) {
         Expanded(
           flex: 2,
           child: Padding(
-            padding: const EdgeInsets.only(
-              top: 12.0,
-              bottom: 12.0,
-              right: 12.0,
-            ),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   blogItem.title,
                   style: const TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -142,7 +119,7 @@ Widget listItem(Blog blogItem) {
                 Text(
                   blogItem.titleDescription,
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
                   ),

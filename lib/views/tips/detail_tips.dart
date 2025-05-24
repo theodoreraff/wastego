@@ -73,11 +73,14 @@ class DetailTipsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             GestureDetector(
@@ -87,12 +90,17 @@ class DetailTipsScreen extends StatelessWidget {
               child: const Icon(Icons.chevron_left, size: 24),
             ),
             const SizedBox(width: 5),
-            Text(
-              tipsItem.title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
+            Container(
+              width: screenWidth * 0.8, // Lebar dibatasi
+              child: Text(
+                tipsItem.title,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.048,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                ),
+                softWrap: true, // Pastikan teks boleh wrap
+                overflow: TextOverflow.visible, // Biarkan teks tampil penuh
               ),
             ),
           ],

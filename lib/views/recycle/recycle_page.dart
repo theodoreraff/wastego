@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,6 +42,8 @@ class _RecyclePageState extends State<RecyclePage> {
     'Kardus': LucideIcons.box,
   };
 
+  final Map<String, FocusNode> focusNodes = {};
+
   // Text controllers for inputting item weights.
   final Map<String, TextEditingController> controllers = {};
   late SharedPreferences prefs;
@@ -54,6 +56,30 @@ class _RecyclePageState extends State<RecyclePage> {
     // Initialize a TextEditingController for each item.
     for (var key in itemWeights.keys) {
       controllers[key] = TextEditingController();
+      focusNodes[key] = FocusNode();
+
+      // Pasang listener untuk validasi saat kehilangan fokus
+      focusNodes[key]!.addListener(() {
+        if (!focusNodes[key]!.hasFocus) {
+          // Saat kehilangan fokus, cek dan validasi nilai
+          final text = controllers[key]!.text;
+          double value = double.tryParse(text) ?? 0.0;
+          if (value > 1000) {
+            value = 1000.0;
+
+            // Update controller text dan state
+            controllers[key]!.text =
+                value % 1 == 0 ? value.toInt().toString() : value.toString();
+
+            setState(() {
+              itemWeights[key] = value;
+            });
+
+            // Update SharedPreferences
+            prefs.setDouble('weight_$key', value);
+          }
+        }
+      });
     }
   }
 
@@ -62,12 +88,14 @@ class _RecyclePageState extends State<RecyclePage> {
     prefs = await SharedPreferences.getInstance();
     idToken = prefs.getString('idToken'); // Load token.
 
+    for (var key in itemWeights.keys) {
+      await prefs.remove('weight_$key');
+    }
     setState(() {
       // Load saved weights or default to 0.0.
       for (var key in itemWeights.keys) {
-        double weight = prefs.getDouble('weight_$key') ?? 0.0;
-        itemWeights[key] = weight;
-        controllers[key]?.text = weight > 0 ? weight.toString() : '';
+        itemWeights[key] = 0.0;
+        controllers[key]?.text = '';
       }
     });
   }
@@ -78,6 +106,9 @@ class _RecyclePageState extends State<RecyclePage> {
     for (var controller in controllers.values) {
       controller.dispose();
     }
+    for (var node in focusNodes.values) {
+      node.dispose();
+    }
     super.dispose();
   }
 
@@ -87,7 +118,10 @@ class _RecyclePageState extends State<RecyclePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Tunggu dulu!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          title: const Text(
+            'Tunggu dulu!',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          ),
           content: Text(
             action == 'estimasi'
                 ? 'Masukkan berat barang untuk melihat estimasi nilai tukar.'
@@ -97,8 +131,13 @@ class _RecyclePageState extends State<RecyclePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFF003D3D)),
-              child: const Text('Oke', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF003D3D),
+              ),
+              child: const Text(
+                'Oke',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
             ),
           ],
         );
@@ -119,55 +158,74 @@ class _RecyclePageState extends State<RecyclePage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(
-              child: Text('Estimasi Penukaran', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-            ),
-            const SizedBox(height: 12),
-            ...itemWeights.entries
-                .where((entry) => entry.value > 0)
-                .map(
-                  (entry) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
+      builder:
+          (_) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    'Estimasi Penukaran',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...itemWeights.entries
+                    .where((entry) => entry.value > 0)
+                    .map(
+                      (entry) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${entry.key} (${entry.value.toStringAsFixed(2)} kg)',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              'Rp${(entry.value * itemPricesPerKg[entry.key]!).toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                const Divider(),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '${entry.key} (${entry.value.toStringAsFixed(2)} kg)',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    const Text(
+                      'Total Estimasi:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
-                      'Rp${(entry.value * itemPricesPerKg[entry.key]!).toStringAsFixed(0)}',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      'Rp${itemWeights.entries.map((e) => e.value * itemPricesPerKg[e.key]!).reduce((a, b) => a + b).toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Total Estimasi:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Text(
-                  'Rp${itemWeights.entries.map((e) => e.value * itemPricesPerKg[e.key]!).reduce((a, b) => a + b).toStringAsFixed(0)}',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                const SizedBox(height: 8),
+                const Text(
+                  '*Estimasi harga dapat berubah tergantung kondisi barang.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            const Text(
-              '*Estimasi harga dapat berubah tergantung kondisi barang.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -181,14 +239,18 @@ class _RecyclePageState extends State<RecyclePage> {
 
     if (idToken == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Token tidak ditemukan. Silakan login ulang.')),
+        const SnackBar(
+          content: Text('Token tidak ditemukan. Silakan login ulang.'),
+        ),
       );
       return;
     }
 
     // Prepare request body with waste details.
     Map<String, dynamic> requestBody = {
-      'wasteDetails': itemWeights.map((key, value) => MapEntry(key.toLowerCase(), value.toInt())),
+      'wasteDetails': itemWeights.map(
+        (key, value) => MapEntry(key.toLowerCase(), value.toInt()),
+      ),
     };
 
     try {
@@ -214,14 +276,18 @@ class _RecyclePageState extends State<RecyclePage> {
       } else {
         // Show error from the server.
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengirim permintaan: ${response.reasonPhrase}')),
+          SnackBar(
+            content: Text(
+              'Gagal mengirim permintaan: ${response.reasonPhrase}',
+            ),
+          ),
         );
       }
     } catch (e) {
       // Show general error message.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
     }
   }
 
@@ -229,7 +295,10 @@ class _RecyclePageState extends State<RecyclePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recycle', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+        title: const Text(
+          'Recycle',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        ),
         leading: const BackButton(),
         scrolledUnderElevation: 0,
         actions: [
@@ -238,7 +307,10 @@ class _RecyclePageState extends State<RecyclePage> {
             child: IconButton(
               icon: const Icon(Icons.info_outline, size: 28),
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const InfoPage()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const InfoPage()),
+                );
               },
             ),
           ),
@@ -259,8 +331,8 @@ class _RecyclePageState extends State<RecyclePage> {
                 ),
                 child: const Text(
                   '🌍 Mari daur ulang barang bekasmu!\n'
-                      'Masukkan berat barang yang ingin Anda daur ulang untuk mendapatkan estimasi penukaran. '
-                      'Semakin banyak barang yang Anda masukkan, semakin besar estimasi yang akan Anda terima.',
+                  'Masukkan berat barang yang ingin Anda daur ulang untuk mendapatkan estimasi penukaran. '
+                  'Semakin banyak barang yang Anda masukkan, semakin besar estimasi yang akan Anda terima.',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                   textAlign: TextAlign.center,
                 ),
@@ -275,7 +347,10 @@ class _RecyclePageState extends State<RecyclePage> {
               ...itemWeights.keys.map((key) {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(color: Colors.grey.shade300),
@@ -288,7 +363,10 @@ class _RecyclePageState extends State<RecyclePage> {
                       Expanded(
                         child: Text(
                           key,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -299,27 +377,48 @@ class _RecyclePageState extends State<RecyclePage> {
                             final hasText = controller.text.isNotEmpty;
                             return TextField(
                               controller: controller,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              focusNode: focusNodes[key],
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d*\.?\d{0,2}'),
+                                ),
+                              ],
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               textAlign: TextAlign.center,
                               decoration: InputDecoration(
                                 hintText: hasText ? null : 'kg',
                                 labelText: hasText ? 'kg' : null,
-                                floatingLabelBehavior: FloatingLabelBehavior.auto,
-                                labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.auto,
+                                labelStyle: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
                                 hintStyle: const TextStyle(color: Colors.grey),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: const BorderSide(color: Colors.grey),
+                                  borderSide: const BorderSide(
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide: const BorderSide(color: Color(0xFF003D3D), width: 2),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFF003D3D),
+                                    width: 2,
+                                  ),
                                 ),
                                 isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
                               ),
                               onChanged: (value) async {
                                 double parsed = double.tryParse(value) ?? 0.0;
@@ -327,7 +426,10 @@ class _RecyclePageState extends State<RecyclePage> {
                                   itemWeights[key] = parsed;
                                 });
                                 setInnerState(() {});
-                                await prefs.setDouble('weight_$key', parsed); // Save weight to SharedPreferences.
+                                await prefs.setDouble(
+                                  'weight_$key',
+                                  parsed,
+                                ); // Save weight to SharedPreferences.
                               },
                             );
                           },
