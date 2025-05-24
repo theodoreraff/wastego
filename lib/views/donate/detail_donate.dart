@@ -137,7 +137,8 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
                     ),
                   ),
