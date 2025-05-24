@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wastego/core/models/tips_model.dart';
 import 'package:wastego/views/tips/detail_tips.dart';
 import 'package:wastego/views/tips/menu_tips.dart';
@@ -16,6 +17,7 @@ class TipsPage extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         elevation: 0,
         title: Row(
           children: [
@@ -38,19 +40,28 @@ class TipsPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView.builder(
-          itemCount: tipsList.length + 2, // Account for header and "More" button.
+          itemCount:
+              tipsList.length + 2, // Account for header and "More" button.
           itemBuilder: (context, index) {
             if (index == 0) {
-              return _headerSection(context); // Display the expert's introduction.
+              return Column(
+                children: [
+                  _headerSection(context),
+                  const SizedBox(
+                    height: 10,
+                  ), // <-- jarak antara header dan tips
+                ],
+              );
             } else if (index <= tipsList.length) {
               final Tips tips = tipsList[index - 1]; // Get tip from list.
               return GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailTipsScreen(tipsItem: tips),
-                  ),
-                ),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailTipsScreen(tipsItem: tips),
+                      ),
+                    ),
                 child: _tipsItem(tips), // Display individual tip item.
               );
             } else if (index == tipsList.length + 1) {
@@ -121,14 +132,34 @@ class TipsPage extends StatelessWidget {
               const SizedBox(height: 2),
               const Text(
                 'Environmental Expert and Sustainability Advocate',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
               ),
               const SizedBox(height: 2),
               GestureDetector(
+                onTap: () async {
+                  final Uri emailUri = Uri(
+                    scheme: 'mailto',
+                    path: 'adam.smith@gmail.com',
+                  );
+
+                  if (await canLaunchUrl(emailUri)) {
+                    await launchUrl(
+                      emailUri,
+                      mode: LaunchMode.externalApplication, // ✅ Ini penting!
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Tidak dapat membuka aplikasi email'),
+                      ),
+                    );
+                  }
+                },
+
                 child: const Text(
                   'Reach Out: adam.smith@gmail.com',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: Color(0xFF32A824),
                     decoration: TextDecoration.underline,
@@ -148,7 +179,7 @@ class TipsPage extends StatelessWidget {
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 6),
+      margin: const EdgeInsets.all(3),
       child: Row(
         children: [
           Expanded(
@@ -164,11 +195,7 @@ class TipsPage extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.only(
-                top: 12.0,
-                bottom: 12.0,
-                right: 12.0,
-              ),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -176,7 +203,7 @@ class TipsPage extends StatelessWidget {
                     tipsItem.title,
                     style: const TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -184,7 +211,7 @@ class TipsPage extends StatelessWidget {
                   Text(
                     tipsItem.titleDescription,
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 12,
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w400,
                     ),
