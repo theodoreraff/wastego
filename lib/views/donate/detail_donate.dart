@@ -23,20 +23,29 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8), // Atur sesuai kebutuhan
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(
-              Icons.arrow_back,
-              size: 24,
-            ), // Sama seperti BackButton
-          ),
-        ),
-        titleSpacing: 0,
-        title: Text(
-          widget.donateItem.title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Container(
+              width: screenWidth * 0.82,
+              child: Text(
+                widget.donateItem.title,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.050,
+
+                  fontWeight: FontWeight.w600,
+                ),
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          ],
         ),
       ),
 
@@ -100,8 +109,8 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                     ),
                     const SizedBox(width: 16),
                     CircularPercentIndicator(
-                      radius: screenWidth * 0.11,
-                      lineWidth: screenWidth * 0.03,
+                      radius: screenWidth * 0.10,
+                      lineWidth: screenWidth * 0.025,
                       animation: true,
                       percent: widget.donateItem.donationPercentage.clamp(
                         0.0,
@@ -346,7 +355,6 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       'Informasi Terbaru (1)',
                       style: TextStyle(
                         fontSize: 16,
-
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.justify,
@@ -355,7 +363,6 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       widget.donateItem.updateInfoDate,
                       style: TextStyle(
                         fontSize: 13,
-
                         fontWeight: FontWeight.w200,
                       ),
                       textAlign: TextAlign.justify,
@@ -365,7 +372,6 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       widget.donateItem.updateInfo,
                       style: TextStyle(
                         fontSize: 14,
-
                         fontWeight: FontWeight.w400,
                       ),
                       textAlign: TextAlign.justify,

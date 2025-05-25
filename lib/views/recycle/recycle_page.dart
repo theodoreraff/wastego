@@ -295,17 +295,29 @@ class _RecyclePageState extends State<RecyclePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Recycle',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-        ),
-        leading: const BackButton(),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Daur Ulang',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: IconButton(
-              icon: const Icon(Icons.info_outline, size: 28),
+              icon: const Icon(Icons.info_outline, size: 25),
               onPressed: () {
                 Navigator.push(
                   context,

@@ -10,7 +10,6 @@ class BlogPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
@@ -24,13 +23,9 @@ class BlogPage extends StatelessWidget {
               child: const Icon(Icons.chevron_left, size: 24),
             ),
             const SizedBox(width: 5),
-            const Text(
-              "Blog",
-              style: TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
+            Text(
+              'Blog',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -110,7 +105,6 @@ Widget listItem(Blog blogItem) {
                 Text(
                   blogItem.title,
                   style: const TextStyle(
-                    fontFamily: 'Poppins',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -120,7 +114,7 @@ Widget listItem(Blog blogItem) {
                   blogItem.titleDescription,
                   style: const TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Poppins',
+
                     fontWeight: FontWeight.w400,
                   ),
                 ),

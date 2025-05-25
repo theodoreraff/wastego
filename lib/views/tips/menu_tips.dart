@@ -9,7 +9,6 @@ class MenuTipsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
@@ -23,13 +22,9 @@ class MenuTipsScreen extends StatelessWidget {
               child: const Icon(Icons.chevron_left, size: 24),
             ),
             const SizedBox(width: 5),
-            const Text(
-              "Menu Tips",
-              style: TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
+            Text(
+              'Menu Tips',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -96,7 +91,6 @@ class _TipsListItem extends StatelessWidget {
                   Text(
                     tipsItem.title,
                     style: const TextStyle(
-                      fontFamily: 'Poppins',
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -106,7 +100,6 @@ class _TipsListItem extends StatelessWidget {
                     tipsItem.titleDescription,
                     style: const TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Poppins',
                       fontWeight: FontWeight.w400,
                     ),
                   ),

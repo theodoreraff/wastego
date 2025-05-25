@@ -45,13 +45,6 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
-  // START CODE TES
-  String formatUid(String rawUid) {
-    final int numericUid = rawUid.hashCode.abs() % 1000000;
-    final formattedNumber = numericUid.toString().padLeft(6, '0');
-    return 'WGO-$formattedNumber';
-  }
-  // END CODE TES
 
   Future<void> handleLogin() async {
     final email = emailController.text.trim();
@@ -91,24 +84,14 @@ class _LoginFormState extends State<LoginForm> {
       if (token != null) {
         await ApiService.saveToken(token);
 
-        // final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-        //         await profileProvider.fetchProfile();
-        
-        // START CODE TES
-        final user = response['user'];
-        final username = user?['username'] ?? 'User';
-        final poin = user?['poin'] ?? 0;
-        final rawUid = user?['uid'] ?? 'unknown';
-        final uidFormatted = formatUid(rawUid);
+        // Ambil instance ProfileProvider dan fetch profile
+        final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+        await profileProvider.fetchProfile();
 
-        _showMessage(
-          'Login berhasil!\nUsername: $username\nPoin: $poin\nUID: $uidFormatted',
-          isError: false,
-        );
+        _showMessage('Login berhasil!', isError: false);
         Future.delayed(const Duration(milliseconds: 500), () {
           Navigator.pushReplacementNamed(context, '/home');
         });
-        // END CODE TES
       } else {
         setState(() {
           errorMessage = 'Login gagal: Token tidak ditemukan.';
@@ -146,18 +129,14 @@ class _LoginFormState extends State<LoginForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Alamat Email',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        const Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         TextField(
           controller: emailController,
           focusNode: emailFocus,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
-          onSubmitted:
-              (_) => FocusScope.of(context).requestFocus(passwordFocus),
+          onSubmitted: (_) => FocusScope.of(context).requestFocus(passwordFocus),
           decoration: InputDecoration(
             hintText: 'Masukkan Email',
             hintStyle: const TextStyle(color: Colors.grey),
@@ -206,10 +185,7 @@ class _LoginFormState extends State<LoginForm> {
         if (errorMessage != null) ...[
           Text(
             errorMessage!,
-            style: const TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
         ],
@@ -217,17 +193,16 @@ class _LoginFormState extends State<LoginForm> {
         Align(
           alignment: Alignment.centerRight,
           child: GestureDetector(
-            onTap:
-                isLoading
-                    ? null
-                    : () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ForgotPasswordPage(),
-                        ),
-                      );
-                    },
+            onTap: isLoading
+                ? null
+                : () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ForgotPasswordPage(),
+                ),
+              );
+            },
             child: Text(
               'Lupa Password?',
               style: TextStyle(

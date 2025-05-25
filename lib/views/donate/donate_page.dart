@@ -21,17 +21,21 @@ class _DonatePageState extends State<DonatePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8), // Atur sesuai kebutuhan
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back, size: 24),
-          ),
-        ),
-        titleSpacing: 0,
-        title: Text(
-          'Donasi',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Donasi',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
         ),
       ),
       body: Padding(
@@ -151,7 +155,6 @@ class _DonatePageState extends State<DonatePage> {
     return TextSpan(
       style: const TextStyle(
         fontSize: 16,
-
         fontWeight: FontWeight.w600,
         color: Color.fromARGB(255, 32, 170, 36),
       ),

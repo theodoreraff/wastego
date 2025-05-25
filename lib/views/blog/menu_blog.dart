@@ -8,8 +8,7 @@ class MenuBlogScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
@@ -22,13 +21,9 @@ class MenuBlogScreen extends StatelessWidget {
               child: const Icon(Icons.chevron_left, size: 24),
             ),
             const SizedBox(width: 5),
-            const Text(
-              "Menu Blog",
-              style: TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
+            Text(
+              'Menu Blog',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -85,7 +80,6 @@ Widget listItem(Blog blogItem) {
                 Text(
                   blogItem.title,
                   style: const TextStyle(
-                    fontFamily: 'Poppins',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -95,7 +89,7 @@ Widget listItem(Blog blogItem) {
                   blogItem.titleDescription,
                   style: const TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Poppins',
+
                     fontWeight: FontWeight.w400,
                   ),
                 ),

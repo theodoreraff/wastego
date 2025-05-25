@@ -28,127 +28,166 @@ class _SchedulePageState extends State<SchedulePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Jadwal Penjemputan',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        leading: const BackButton(),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: scheduleProvider.isLoading
-            ? const Center(child: CircularProgressIndicator()) // Show loading indicator.
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        title: Row(
           children: [
-            const SizedBox(height: 16),
-            const Text(
-              "Lokasi Kamu:",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Color(0xFF003539),
-              ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(
-                  Icons.location_on,
-                  size: 20,
-                  color: Color(0xFF003539),
-                ),
-                SizedBox(width: 4),
-                Text(
-                  "Surabaya, Jawa Timur", // Static location for now.
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF003539),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildLocationFilterButton(), // Button to filter by location.
-            const SizedBox(height: 16),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  // Allow refreshing the schedule list.
-                  await Provider.of<ScheduleProvider>(
-                    context,
-                    listen: false,
-                  ).fetchSchedules();
-                },
-                child: scheduleProvider.schedules.isEmpty
-                    ? const Center(child: Text("Belum ada jadwal.")) // Show message if no schedules.
-                    : ListView.builder(
-                  itemCount: scheduleProvider.schedules.length,
-                  itemBuilder: (context, index) {
-                    final schedule = scheduleProvider.schedules[index];
-                    final day = DateFormat.EEEE().format(schedule.date);
-                    final date = DateFormat('dd').format(schedule.date);
-
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                      color: Colors.white,
-                      child: ListTile(
-                        contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        leading: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFAFEE00),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            date,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          day,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF003539),
-                          ),
-                        ),
-                        subtitle: Text(
-                          schedule.time ?? "-",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black.withOpacity(0.7),
-                          ),
-                        ),
-                        trailing: Container(
-                          width: 8,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: schedule.time != null
-                                ? const Color(0xFF003539)
-                                : Colors.grey[300],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
+            const SizedBox(width: 5),
+            Text(
+              'Jadwal Penjemputan',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child:
+            scheduleProvider.isLoading
+                ? const Center(
+                  child: CircularProgressIndicator(),
+                ) // Show loading indicator.
+                : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Lokasi Kamu:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Color(0xFF003539),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.location_on,
+                          size: 20,
+                          color: Color(0xFF003539),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          "Surabaya, Jawa Timur", // Static location for now.
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF003539),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLocationFilterButton(), // Button to filter by location.
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: Container(
+                        // onRefresh: () async {
+                        //   // Allow refreshing the schedule list.
+                        //   await Provider.of<ScheduleProvider>(
+                        //     context,
+                        //     listen: false,
+                        //   ).fetchSchedules();
+                        // },
+                        child:
+                            scheduleProvider.schedules.isEmpty
+                                ? const Center(
+                                  child: Text("Belum ada jadwal."),
+                                ) // Show message if no schedules.
+                                : ListView.builder(
+                                  itemCount: scheduleProvider.schedules.length,
+                                  itemBuilder: (context, index) {
+                                    final schedule =
+                                        scheduleProvider.schedules[index];
+                                    final day = scheduleProvider
+                                        .translateDayToIndonesian(
+                                          DateFormat.EEEE().format(
+                                            schedule.date,
+                                          ),
+                                        );
+
+                                    final date = DateFormat(
+                                      'dd',
+                                    ).format(schedule.date);
+
+                                    return Card(
+                                      margin: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      elevation: 5,
+                                      color: Colors.white,
+                                      child: ListTile(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 12,
+                                            ),
+                                        leading: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFAFEE00),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            date,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        title: Text(
+                                          day,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF003539),
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          schedule.time ?? "-",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black.withOpacity(
+                                              0.7,
+                                            ),
+                                          ),
+                                        ),
+                                        trailing: Container(
+                                          width: 8,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                schedule.time != null
+                                                    ? const Color(0xFF003539)
+                                                    : Colors.grey[300],
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                      ),
+                    ),
+                  ],
+                ),
       ),
     );
   }

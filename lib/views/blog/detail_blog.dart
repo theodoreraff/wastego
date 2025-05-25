@@ -32,7 +32,6 @@ class DetailBlogScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -42,7 +41,6 @@ class DetailBlogScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      fontFamily: 'Poppins',
                     ),
                   ),
                 ),
@@ -63,7 +61,6 @@ class DetailBlogScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins',
                       ),
                     )
                     : const Text(''),
@@ -74,7 +71,6 @@ class DetailBlogScreen extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       height: 1.4,
-                      fontFamily: 'Poppins',
                     ),
                     textAlign: TextAlign.justify,
                   ),
@@ -94,7 +90,6 @@ class DetailBlogScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
@@ -109,21 +104,22 @@ class DetailBlogScreen extends StatelessWidget {
             ),
             const SizedBox(width: 5),
             Container(
-              width: screenWidth * 0.8,
+              width: screenWidth * 0.82,
               child: Text(
                 blogItem.title,
                 style: TextStyle(
-                  fontSize: screenWidth * 0.048,
-                  fontFamily: 'Poppins',
+                  fontSize: screenWidth * 0.050,
+
                   fontWeight: FontWeight.w600,
                 ),
-                softWrap: true, // Pastikan teks boleh wrap
-                overflow: TextOverflow.visible, // Biarkan teks tampil penuh
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ],
         ),
       ),
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(15.0),
@@ -150,7 +146,7 @@ class DetailBlogScreen extends StatelessWidget {
                         blogItem.author,
                         style: const TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Poppins',
+
                           color: Colors.black87,
                         ),
                       ),
@@ -159,7 +155,7 @@ class DetailBlogScreen extends StatelessWidget {
                         blogItem.uploadDate,
                         style: const TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Poppins',
+
                           color: Colors.black54,
                         ),
                       ),
@@ -172,7 +168,7 @@ class DetailBlogScreen extends StatelessWidget {
                 'Materials Required :',
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Poppins',
+
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -180,7 +176,7 @@ class DetailBlogScreen extends StatelessWidget {
                 blogItem.materials,
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Poppins',
+
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -188,7 +184,7 @@ class DetailBlogScreen extends StatelessWidget {
                 'Steps :',
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Poppins',
+
                   fontWeight: FontWeight.w600,
                 ),
               ),

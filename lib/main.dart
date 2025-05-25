@@ -74,24 +74,18 @@ class MyApp extends StatelessWidget {
       title: 'WasteGo App', // The title of the application.
       debugShowCheckedModeBanner: false, // Hides the debug banner.
       initialRoute: AppRoutes.onboarding, // Sets the initial route of the app.
-      onGenerateRoute:
-          AppRoutes.generateRoute, // Defines how routes are generated.
+      onGenerateRoute: AppRoutes.generateRoute, // Defines how routes are generated.
       theme: ThemeData(
         useMaterial3: true, // Enables Material 3 design.
-        scaffoldBackgroundColor:
-            Colors.white, // Sets the default background color for scaffolds.
+        scaffoldBackgroundColor: Colors.white, // Sets the default background color for scaffolds.
         // Applies Google Fonts Poppins to the app's text theme.
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
         primarySwatch: Colors.green, // Sets the primary color swatch to green.
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white, // Sets the app bar background color.
-          foregroundColor:
-              Colors
-                  .black, // Sets the app bar foreground color (e.g., icons, text).
+          foregroundColor: Colors.black, // Sets the app bar foreground color (e.g., icons, text).
           elevation: 0, // Removes the shadow under the app bar.
-          systemOverlayStyle:
-              SystemUiOverlayStyle
-                  .dark, // Sets the system overlay style for the app bar.
+          systemOverlayStyle: SystemUiOverlayStyle.dark, // Sets the system overlay style for the app bar.
         ),
       ),
     );

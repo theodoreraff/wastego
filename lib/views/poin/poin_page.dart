@@ -15,7 +15,26 @@ class PointsPage extends StatelessWidget {
     final int totalPoints = 0; // Placeholder for user's total points.
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Poin Kamu'), scrolledUnderElevation: 0),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Poin Kamu',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),

@@ -44,11 +44,25 @@ class _EventsPageState extends State<EventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Events"),
-        centerTitle: false,
-        leading: const BackButton(),
+       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Event',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
       body:
           _isLoading
@@ -81,7 +95,7 @@ class _EventsPageState extends State<EventsPage> {
                             child: Padding(
                               padding: EdgeInsets.only(top: 40),
                               child: Text(
-                                "No events available.",
+                                "Event tidak ditemukan",
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ),
@@ -104,7 +118,7 @@ class _EventsPageState extends State<EventsPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          "All Events:",
+          "Semua Event:",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         Container(
@@ -166,7 +180,7 @@ class _EventsPageState extends State<EventsPage> {
             alignment: Alignment.center,
             child: Text(
               event.date, // Display event date.
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
           const SizedBox(width: 12),
@@ -181,7 +195,7 @@ class _EventsPageState extends State<EventsPage> {
                 const SizedBox(height: 4),
                 Text(
                   "${event.time} • ${event.location}", // Event time and location.
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),

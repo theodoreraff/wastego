@@ -8,23 +8,27 @@ class DonateHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8), // Atur sesuai kebutuhan
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back, size: 24),
-          ),
-        ),
-        titleSpacing: 0,
-        title: Text(
-          'Riwayat Donasi',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Riwayat Donasi',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
         ),
       ),
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
