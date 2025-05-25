@@ -8,6 +8,6 @@ class UserModel {
     required this.uid,
     required this.username,
     required this.email,
-    this.points = 0,
+    required this.points,
   });
 }
