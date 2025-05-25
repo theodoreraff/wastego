@@ -16,32 +16,30 @@ class DetailDonateScreen extends StatefulWidget {
 class _DetailDonateScreenState extends State<DetailDonateScreen> {
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
-        title: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.chevron_left, size: 24),
-            ),
-            const SizedBox(width: 5),
-            Text(
-              widget.donateItem.title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8), // Atur sesuai kebutuhan
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: const Icon(
+              Icons.arrow_back,
+              size: 24,
+            ), // Sama seperti BackButton
+          ),
+        ),
+        titleSpacing: 0,
+        title: Text(
+          widget.donateItem.title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(15.0),
@@ -63,7 +61,7 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                   border: Border.all(color: Colors.grey, width: 1.0),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -73,29 +71,37 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${widget.donateItem.formattedTotalDonate} raised',
+                            '${widget.donateItem.formattedTotalDonate} terkumpul',
                             style: const TextStyle(
-                              fontSize: 18,
-                              fontFamily: 'Poppins',
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+
                           const SizedBox(height: 8),
 
-                          Text(
-                            '${widget.donateItem.formatCurrency(widget.donateItem.targetDonate)} target',
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${widget.donateItem.totalUniqueDonors} Contributions',
+                          Row(
+                            children: [
+                              Text(
+                                '${widget.donateItem.formatCurrency(widget.donateItem.targetDonate)} target',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              SizedBox(width: 16),
+                              Icon(Icons.people, size: 20),
+                              SizedBox(width: 4),
+                              Text(
+                                widget.donateItem.totalUniqueDonors.toString(),
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(width: 16),
                     CircularPercentIndicator(
-                      radius: 45.0,
-                      lineWidth: 12.0,
+                      radius: screenWidth * 0.11,
+                      lineWidth: screenWidth * 0.03,
                       animation: true,
                       percent: widget.donateItem.donationPercentage.clamp(
                         0.0,
@@ -103,10 +109,9 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       ),
                       center: Text(
                         widget.donateItem.formattedPercentage,
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 20.0,
+                          fontSize: screenWidth * 0.05,
                         ),
                       ),
                       circularStrokeCap: CircularStrokeCap.round,
@@ -136,7 +141,6 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       'Donasi Sekarang',
                       style: TextStyle(
                         fontSize: 18,
-                        fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                       ),
@@ -158,8 +162,8 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                     Text(
                       'Tentang Program',
                       style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'Poppins',
+                        fontSize: 16,
+
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.justify,
@@ -169,7 +173,7 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       widget.donateItem.description,
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Poppins',
+
                         fontWeight: FontWeight.w400,
                       ),
                       textAlign: TextAlign.justify,
@@ -194,8 +198,8 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                         Text(
                           'Donasi',
                           style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'Poppins',
+                            fontSize: 16,
+
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -213,10 +217,10 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                               ),
                               SizedBox(width: 6),
                               Text(
-                                'See Top',
+                                'Teratas',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontFamily: 'Poppins',
+
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
@@ -256,7 +260,7 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                                               donation.name,
                                               style: const TextStyle(
                                                 fontSize: 14,
-                                                fontFamily: 'Poppins',
+
                                                 fontWeight: FontWeight.w400,
                                               ),
                                             ),
@@ -265,7 +269,7 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                                               donation.amount,
                                               style: const TextStyle(
                                                 fontSize: 14,
-                                                fontFamily: 'Poppins',
+
                                                 fontWeight: FontWeight.w400,
                                               ),
                                             ),
@@ -314,10 +318,10 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                             elevation: 0,
                           ),
                           child: const Text(
-                            'See All',
+                            'Lihat Semua',
                             style: TextStyle(
                               fontSize: 18,
-                              fontFamily: 'Poppins',
+
                               fontWeight: FontWeight.w400,
                             ),
                           ),
@@ -339,10 +343,10 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Update (1)',
+                      'Informasi Terbaru (1)',
                       style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'Poppins',
+                        fontSize: 16,
+
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.justify,
@@ -350,8 +354,8 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                     Text(
                       widget.donateItem.updateInfoDate,
                       style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: 'Poppins',
+                        fontSize: 13,
+
                         fontWeight: FontWeight.w200,
                       ),
                       textAlign: TextAlign.justify,
@@ -361,7 +365,7 @@ class _DetailDonateScreenState extends State<DetailDonateScreen> {
                       widget.donateItem.updateInfo,
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Poppins',
+
                         fontWeight: FontWeight.w400,
                       ),
                       textAlign: TextAlign.justify,

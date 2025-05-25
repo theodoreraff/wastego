@@ -18,28 +18,20 @@ class _DonatePageState extends State<DonatePage> {
         donateList.where((donate) => donate.status == selectedStatus).toList();
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.chevron_left, size: 24),
-            ),
-            const SizedBox(width: 5),
-            const Text(
-              "Donate",
-              style: TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8), // Atur sesuai kebutuhan
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: const Icon(Icons.arrow_back, size: 24),
+          ),
+        ),
+        titleSpacing: 0,
+        title: Text(
+          'Donasi',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
       body: Padding(
@@ -76,16 +68,15 @@ class _DonatePageState extends State<DonatePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Our Campaigns',
+                        'Kampanye Kami',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       Container(
                         height: 40,
-                        width: 150,
+                        width: 140,
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade400),
@@ -105,8 +96,8 @@ class _DonatePageState extends State<DonatePage> {
                                   child: Text(
                                     value,
                                     style: const TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'Poppins',
+                                      fontSize: 16,
+
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
@@ -127,12 +118,8 @@ class _DonatePageState extends State<DonatePage> {
                       padding: EdgeInsets.only(top: 40),
                       child: Center(
                         child: Text(
-                          "No campaigns available for this status.",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                            fontFamily: 'Poppins',
-                          ),
+                          "Tidak ada kampanye yang tersedia",
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
                         ),
                       ),
                     ),
@@ -164,7 +151,7 @@ class _DonatePageState extends State<DonatePage> {
     return TextSpan(
       style: const TextStyle(
         fontSize: 16,
-        fontFamily: 'Poppins',
+
         fontWeight: FontWeight.w600,
         color: Color.fromARGB(255, 32, 170, 36),
       ),
@@ -192,7 +179,6 @@ Widget listItem(Donate donateItem) {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
     elevation: 2,
     child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           flex: 1,
@@ -215,7 +201,6 @@ Widget listItem(Donate donateItem) {
                 Text(
                   donateItem.title,
                   style: const TextStyle(
-                    fontFamily: 'Poppins',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -225,7 +210,7 @@ Widget listItem(Donate donateItem) {
                   donateItem.titleDescription,
                   style: const TextStyle(
                     fontSize: 12,
-                    fontFamily: 'Poppins',
+
                     fontWeight: FontWeight.w400,
                   ),
                 ),

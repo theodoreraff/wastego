@@ -8,30 +8,23 @@ class DonateHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.chevron_left, size: 24),
-            ),
-            const SizedBox(width: 5),
-            Text(
-              'Riwayat Donasi',
-              style: const TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8), // Atur sesuai kebutuhan
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: const Icon(Icons.arrow_back, size: 24),
+          ),
+        ),
+        titleSpacing: 0,
+        title: Text(
+          'Riwayat Donasi',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
+
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -61,7 +54,7 @@ class DonateHistoryScreen extends StatelessWidget {
                                   donation.name,
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    fontFamily: 'Poppins',
+
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -70,7 +63,7 @@ class DonateHistoryScreen extends StatelessWidget {
                                   donation.amount,
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    fontFamily: 'Poppins',
+
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -81,7 +74,7 @@ class DonateHistoryScreen extends StatelessWidget {
                             donation.donationDate,
                             style: const TextStyle(
                               fontSize: 14,
-                              fontFamily: 'Poppins',
+
                               fontWeight: FontWeight.w400,
                             ),
                           ),
