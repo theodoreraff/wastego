@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/services/api_service.dart';
 import 'components/home_top_section.dart';
 import 'components/home_stats.dart';
 import 'components/eco_tips_carousel.dart';
@@ -15,11 +16,44 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // Simulated user data (to be replaced with real data from backend/API)
-  // TODO: Replaced Backend/API
-  final String _userName = 'WasteHero';
-  final int _points = 145000;
-  final String _userId = 'WGO-001234';
+  // User data
+  String userId = '';
+  String username = '';
+  int balancePoint = 0;
+  bool isLoading = false;
+
+  // Ambil data profil dari server
+  Future<void> fetchProfile() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiService.getUserProfile();
+      debugPrint('Profile API response Home: $response');
+
+      // Ambil data dari 'profile'
+      final profile = response['profile'] ?? {};
+
+      setState(() {
+        userId = profile['uid']?.toString() ?? '';
+        username = profile['username'] ?? '';
+        balancePoint = profile['balancePoint'] ?? 0;
+      });
+    } catch (e) {
+      debugPrint('Gagal mengambil profil: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProfile(); // Panggil saat halaman di-load
+  }
 
   /// Handles navigation between tabs.
   void _onItemTapped(int index) {
@@ -46,14 +80,16 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         child: Column(
           children: [
             // Combined header + menu
             HomeTopSection(
-              userName: _userName,
-              points: _points,
-              userId: _userId,
+              userName: username,
+              points: balancePoint,
+              userId: userId,
             ),
 
             const SizedBox(height: 5),

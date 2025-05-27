@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../core/services/api_service.dart';
@@ -28,6 +29,7 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void _showMessage(String message, {bool isError = true}) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -39,10 +41,34 @@ class _LoginFormState extends State<LoginForm> {
 
   void _clearError() {
     if (errorMessage != null) {
-      setState(() {
-        errorMessage = null;
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = null;
+        });
+      }
     }
+  }
+
+  String _parseGenericError(String errorStringFull) {
+    String errorStringLc = errorStringFull.toLowerCase();
+    String displayError;
+
+    if (errorStringLc.contains('invalid credentials') ||
+        errorStringLc.contains('user not found') ||
+        errorStringLc.contains('unauthorized') ||
+        errorStringLc.contains('wrong password') ||
+        errorStringLc.contains('password yang anda masukkan salah')) {
+      displayError = 'Login gagal: Email atau password salah.';
+    } else if (errorStringLc.contains('network') ||
+        errorStringLc.contains('socketexception') ||
+        errorStringLc.contains('timeout') ||
+        errorStringLc.contains('host lookup') ||
+        errorStringLc.contains('failed host lookup')) {
+      displayError = 'Login gagal: Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+    } else {
+      displayError = 'Login gagal: ${errorStringFull.replaceFirst("Exception: ", "")}';
+    }
+    return displayError;
   }
 
 
@@ -50,7 +76,6 @@ class _LoginFormState extends State<LoginForm> {
     final email = emailController.text.trim();
     final password = passwordController.text;
 
-    // Validasi input tetap sama
     if (email.isEmpty) {
       _showMessage('Email tidak boleh kosong.');
       return;
@@ -72,39 +97,77 @@ class _LoginFormState extends State<LoginForm> {
       return;
     }
 
-    setState(() {
-      isLoading = true;
-      errorMessage = null;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        errorMessage = null;
+      });
+    }
 
     try {
       final response = await ApiService.login(email, password);
+      final dynamic tokenData = response['token'];
 
-      final token = response['token'];
-      if (token != null) {
-        await ApiService.saveToken(token);
-
-        // Ambil instance ProfileProvider dan fetch profile
-        final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-        await profileProvider.fetchProfile();
-
-        _showMessage('Login berhasil!', isError: false);
-        Future.delayed(const Duration(milliseconds: 500), () {
-          Navigator.pushReplacementNamed(context, '/home');
-        });
+      if (tokenData != null && tokenData is String && tokenData.isNotEmpty) {
+        await ApiService.saveToken(tokenData);
+        if (mounted) {
+          final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+          await profileProvider.fetchProfile();
+          _showMessage('Login berhasil!', isError: false);
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              Navigator.pushReplacementNamed(context, '/home');
+            }
+          });
+        }
       } else {
-        setState(() {
-          errorMessage = 'Login gagal: Token tidak ditemukan.';
-        });
+        if (mounted) {
+          setState(() {
+            errorMessage = response['message'] as String? ?? 'Login gagal: Token tidak ditemukan atau tidak valid.';
+          });
+        }
       }
     } catch (e) {
-      setState(() {
-        errorMessage = 'Login gagal: ${e.toString()}';
-      });
+      if (mounted) {
+        String displayError;
+        String errorStringFull = e.toString();
+
+        try {
+          int jsonStartIndex = errorStringFull.indexOf('{');
+          int jsonEndIndex = errorStringFull.lastIndexOf('}');
+
+          if (jsonStartIndex != -1 && jsonEndIndex != -1 && jsonStartIndex < jsonEndIndex) {
+            String jsonSubstring = errorStringFull.substring(jsonStartIndex, jsonEndIndex + 1);
+            var decodedJson = jsonDecode(jsonSubstring);
+
+            if (decodedJson is Map) {
+              if (decodedJson.containsKey('message') && decodedJson['message'] is String) {
+                displayError = decodedJson['message'] as String;
+              } else if (decodedJson.containsKey('error') && decodedJson['error'] is String) {
+                displayError = decodedJson['error'] as String;
+              } else {
+                displayError = _parseGenericError(errorStringFull);
+              }
+            } else {
+              displayError = _parseGenericError(errorStringFull);
+            }
+          } else {
+            displayError = _parseGenericError(errorStringFull);
+          }
+        } catch (jsonError) {
+          displayError = _parseGenericError(errorStringFull);
+        }
+
+        setState(() {
+          errorMessage = displayError;
+        });
+      }
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -117,6 +180,8 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   void dispose() {
+    emailController.removeListener(_clearError);
+    passwordController.removeListener(_clearError);
     emailController.dispose();
     passwordController.dispose();
     emailFocus.dispose();
@@ -136,7 +201,9 @@ class _LoginFormState extends State<LoginForm> {
           focusNode: emailFocus,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
-          onSubmitted: (_) => FocusScope.of(context).requestFocus(passwordFocus),
+          onSubmitted: (_) {
+            if (!isLoading) FocusScope.of(context).requestFocus(passwordFocus);
+          },
           decoration: InputDecoration(
             hintText: 'Masukkan Email',
             hintStyle: const TextStyle(color: Colors.grey),
@@ -173,9 +240,11 @@ class _LoginFormState extends State<LoginForm> {
                 color: Colors.grey,
               ),
               onPressed: () {
-                setState(() {
-                  isPasswordVisible = !isPasswordVisible;
-                });
+                if (mounted) {
+                  setState(() {
+                    isPasswordVisible = !isPasswordVisible;
+                  });
+                }
               },
             ),
           ),
@@ -183,11 +252,14 @@ class _LoginFormState extends State<LoginForm> {
         const SizedBox(height: 8),
 
         if (errorMessage != null) ...[
-          Text(
-            errorMessage!,
-            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+            child: Text(
+              errorMessage!,
+              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+              textAlign: TextAlign.start,
+            ),
           ),
-          const SizedBox(height: 8),
         ],
 
         Align(
