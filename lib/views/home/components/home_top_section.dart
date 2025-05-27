@@ -184,11 +184,11 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Points: ${widget.points} Eco',
+                                'Poin : ${widget.points} Eco',
                                 style: TextStyle(fontSize: userInfoFontSize, color: Colors.white),
                               ),
                               Text(
-                                'ID: ${widget.userId}',
+                                'ID : ${widget.userId}',
                                 style: TextStyle(fontSize: userInfoFontSize, color: Colors.white),
                               ),
                             ],
@@ -253,12 +253,12 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
 
   /// List of grid menu items.
   List<_MenuItem> get _menuItems => const [
-    _MenuItem(icon: LucideIcons.clock, label: "Schedule", color: Color(0xFF1E1E1E), route: AppRoutes.schedule),
-    _MenuItem(icon: LucideIcons.recycle, label: "Recycle", color: Color(0xFF2CCC86), route: AppRoutes.recycle),
-    _MenuItem(icon: LucideIcons.calendar, label: "Events", color: Color(0xFFAB67F3), route: AppRoutes.events),
+    _MenuItem(icon: LucideIcons.clock, label: "Jadwal", color: Color(0xFF1E1E1E), route: AppRoutes.schedule),
+    _MenuItem(icon: LucideIcons.recycle, label: "Daur Ulang", color: Color(0xFF2CCC86), route: AppRoutes.recycle),
+    _MenuItem(icon: LucideIcons.calendar, label: "Event", color: Color(0xFFAB67F3), route: AppRoutes.events),
     _MenuItem(icon: LucideIcons.lightbulb, label: "Tips", color: Color(0xFFCC9B00), route: AppRoutes.tips),
     _MenuItem(icon: LucideIcons.fileText, label: "Blog", color: Color(0xFF3DBEE5), route: AppRoutes.blog),
-    _MenuItem(icon: LucideIcons.heartHandshake, label: "Donate", color: Color(0xFFF367E8), route: AppRoutes.donate),
+    _MenuItem(icon: LucideIcons.heartHandshake, label: "Donasi", color: Color(0xFFF367E8), route: AppRoutes.donate),
   ];
 }
 

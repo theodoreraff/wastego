@@ -9,16 +9,21 @@ class HelpPage extends StatelessWidget {
 
   /// Launches the default email application with a pre-filled support email.
   Future<void> _sendEmail() async {
-    final emailUri = Uri(
-      scheme: 'mailto',
-      path: 'support@wastego.id',
-      queryParameters: {
-        'subject': 'Laporan Masalah Aplikasi WasteGo',
-        'body': 'Halo tim WasteGo,\n\nSaya mengalami kendala berikut:\n\n[Tuliskan masalah Anda di sini]',
-      },
-    ).toString();
+    final emailUri =
+        Uri(
+          scheme: 'mailto',
+          path: 'support@wastego.id',
+          queryParameters: {
+            'subject': 'Laporan Masalah Aplikasi WasteGo',
+            'body':
+                'Halo tim WasteGo,\n\nSaya mengalami kendala berikut:\n\n[Tuliskan masalah Anda di sini]',
+          },
+        ).toString();
 
-    final ok = await launchUrlString(emailUri, mode: LaunchMode.externalApplication);
+    final ok = await launchUrlString(
+      emailUri,
+      mode: LaunchMode.externalApplication,
+    );
     if (!ok) {
       debugPrint('Tidak dapat membuka aplikasi email.');
     }
@@ -27,10 +32,15 @@ class HelpPage extends StatelessWidget {
   /// Launches WhatsApp with a pre-filled support message.
   Future<void> _openWhatsApp() async {
     final phone = '6287820763118'; // Replace with actual WhatsApp number
-    final message = Uri.encodeComponent('Halo tim WasteGo, saya butuh bantuan.');
+    final message = Uri.encodeComponent(
+      'Halo tim WasteGo, saya butuh bantuan.',
+    );
     final whatsappUrl = 'https://wa.me/$phone?text=$message';
 
-    final ok = await launchUrlString(whatsappUrl, mode: LaunchMode.externalApplication);
+    final ok = await launchUrlString(
+      whatsappUrl,
+      mode: LaunchMode.externalApplication,
+    );
     if (!ok) {
       debugPrint('Tidak dapat membuka WhatsApp.');
     }
@@ -41,9 +51,27 @@ class HelpPage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pusat Bantuan'),
+       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Pusat Bantuan',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -79,7 +107,11 @@ class HelpPage extends StatelessWidget {
                     text: 'Laporkan Masalah',
                     onPressed: _sendEmail,
                     backgroundColor: const Color(0xFF003539),
-                    textColor: const Color(0xFFAFEE00),
+
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      color: const Color(0xFFAFEE00),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -88,7 +120,10 @@ class HelpPage extends StatelessWidget {
                     onPressed: _openWhatsApp,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF003539),
-                      side: const BorderSide(color: Color(0xFF003539), width: 1.4),
+                      side: const BorderSide(
+                        color: Color(0xFF003539),
+                        width: 1.4,
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

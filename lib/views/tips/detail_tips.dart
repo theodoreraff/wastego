@@ -15,8 +15,14 @@ class DetailTipsScreen extends StatelessWidget {
 
     for (var line in lines) {
       final match = RegExp(r'^(\d+)\.\s+(.*)').firstMatch(line);
+      final textStyle = const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        height: 1.5, 
+      );
+
       if (match != null) {
-        // Handle numbered steps
+        // Numbered line
         final number = match.group(1)!;
         final text = match.group(2)!;
         items.add(
@@ -25,44 +31,20 @@ class DetailTipsScreen extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 28,
-                  child: Text(
-                    "$number.",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    text,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
+                SizedBox(width: 28, child: Text("$number.", style: textStyle)),
+                Expanded(child: Text(text, style: textStyle)),
               ],
             ),
           ),
         );
       } else {
-        // Handle unnumbered lines (e.g., paragraphs within steps)
+        // Unnumbered line (misalnya judul langkah)
         items.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Text(
               line,
-              style: const TextStyle(
-                fontSize: 14,
-                height: 1,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w400,
-              ),
+              style: textStyle.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
         );
@@ -73,11 +55,14 @@ class DetailTipsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             GestureDetector(
@@ -87,12 +72,16 @@ class DetailTipsScreen extends StatelessWidget {
               child: const Icon(Icons.chevron_left, size: 24),
             ),
             const SizedBox(width: 5),
-            Text(
-              tipsItem.title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
+            Container(
+              width: screenWidth * 0.82,
+              child: Text(
+                tipsItem.title,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.050,
+                  fontWeight: FontWeight.w600,
+                ),
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ],
@@ -119,7 +108,6 @@ class DetailTipsScreen extends StatelessWidget {
                   tipsItem.description,
                   style: const TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
                   ),
                   textAlign: TextAlign.justify,

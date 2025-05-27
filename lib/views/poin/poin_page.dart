@@ -16,7 +16,24 @@ class PointsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Poin Kamu'),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Poin Kamu',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -45,10 +62,7 @@ class PointsPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 const Text(
                   '🌱 Yuk, mulai daur ulang dan kumpulkan poin pertamamu. Setiap aksi kecilmu buat bumi makin bersih, lho!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 28),
@@ -61,7 +75,10 @@ class PointsPage extends StatelessWidget {
                           // Show a snackbar if the user has no points to redeem.
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Wah, kamu belum punya poin untuk ditukar nih!')),
+                              content: Text(
+                                'Wah, kamu belum punya poin untuk ditukar nih!',
+                              ),
+                            ),
                           );
                         },
                         backgroundColor: const Color(0xFF003539),
@@ -79,7 +96,12 @@ class PointsPage extends StatelessWidget {
                             subject: 'Undangan Wastego',
                           );
                         },
-                        backgroundColor: Colors.white,
+                        backgroundColor: const Color.fromARGB(
+                          255,
+                          217,
+                          216,
+                          216,
+                        ),
                         textColor: const Color(0xFF003539),
                         icon: Icons.person_add,
                       ),
@@ -91,10 +113,7 @@ class PointsPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: Text(
                     '♻️ Bagikan semangat Wastego! Ajak teman dan keluarga buat jadi pahlawan daur ulang juga!',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
                     textAlign: TextAlign.center,
                   ),
                 ),

@@ -46,15 +46,25 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Pengaturan Notifikasi',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Pengaturan Notifikasi',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
         ),
-
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

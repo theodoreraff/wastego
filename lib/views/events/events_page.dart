@@ -30,9 +30,9 @@ class _EventsPageState extends State<EventsPage> {
       await Provider.of<EventProvider>(context, listen: false).loadEvents();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load events: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to load events: $e')));
       }
     } finally {
       if (mounted) {
@@ -44,48 +44,71 @@ class _EventsPageState extends State<EventsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Events"),
-        centerTitle: false,
-        leading: const BackButton(),
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator()) // Show loading indicator.
-          : Consumer<EventProvider>(
-        builder: (context, provider, _) {
-          final events = provider.events;
-
-          // Filter events based on selected status (currently only 'Ongoing' shows all).
-          final filteredEvents = events.where((event) {
-            if (selectedStatus == 'Ongoing') return true; // Shows all events for 'Ongoing' filter.
-            if (selectedStatus == 'Completed') return false; // Placeholder for 'Completed' filter.
-            return true; // Default to showing all.
-          }).toList();
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildFilterDropdown(), // Dropdown to select event status.
-                const SizedBox(height: 16),
-                if (filteredEvents.isEmpty)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 40),
-                      child: Text(
-                        "No events available.",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  )
-                else
-                  ...filteredEvents.map(_buildEventItem).toList(), // Display filtered events.
-              ],
+       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
             ),
-          );
-        },
+            const SizedBox(width: 5),
+            Text(
+              'Event',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
+      body:
+          _isLoading
+              ? const Center(
+                child: CircularProgressIndicator(),
+              ) // Show loading indicator.
+              : Consumer<EventProvider>(
+                builder: (context, provider, _) {
+                  final events = provider.events;
+
+                  // Filter events based on selected status (currently only 'Ongoing' shows all).
+                  final filteredEvents =
+                      events.where((event) {
+                        if (selectedStatus == 'Ongoing')
+                          return true; // Shows all events for 'Ongoing' filter.
+                        if (selectedStatus == 'Completed')
+                          return false; // Placeholder for 'Completed' filter.
+                        return true; // Default to showing all.
+                      }).toList();
+
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildFilterDropdown(), // Dropdown to select event status.
+                        const SizedBox(height: 16),
+                        if (filteredEvents.isEmpty)
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 40),
+                              child: Text(
+                                "Event tidak ditemukan",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          )
+                        else
+                          ...filteredEvents
+                              .map(_buildEventItem)
+                              .toList(), // Display filtered events.
+                      ],
+                    ),
+                  );
+                },
+              ),
     );
   }
 
@@ -95,7 +118,7 @@ class _EventsPageState extends State<EventsPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          "All Events:",
+          "Semua Event:",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         Container(
@@ -109,12 +132,13 @@ class _EventsPageState extends State<EventsPage> {
             child: DropdownButton<String>(
               value: selectedStatus,
               icon: const Icon(Icons.keyboard_arrow_down),
-              items: ['Ongoing', 'Completed'].map((value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value, style: const TextStyle(fontSize: 14)),
-                );
-              }).toList(),
+              items:
+                  ['Ongoing', 'Completed'].map((value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value, style: const TextStyle(fontSize: 14)),
+                    );
+                  }).toList(),
               onChanged: (value) {
                 if (value != null) {
                   setState(() => selectedStatus = value);
@@ -141,7 +165,7 @@ class _EventsPageState extends State<EventsPage> {
             color: Colors.grey.shade100,
             blurRadius: 4,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -156,7 +180,7 @@ class _EventsPageState extends State<EventsPage> {
             alignment: Alignment.center,
             child: Text(
               event.date, // Display event date.
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
           const SizedBox(width: 12),
@@ -171,7 +195,7 @@ class _EventsPageState extends State<EventsPage> {
                 const SizedBox(height: 4),
                 Text(
                   "${event.time} • ${event.location}", // Event time and location.
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
@@ -192,7 +216,10 @@ class _EventsPageState extends State<EventsPage> {
                 final uri = Uri.parse(url);
                 try {
                   // Launch the RSVP URL in an external application.
-                  final success = await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  final success = await launchUrl(
+                    uri,
+                    mode: LaunchMode.externalApplication,
+                  );
                   if (!success && mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Could not open browser.')),

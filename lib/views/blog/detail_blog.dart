@@ -31,8 +31,7 @@ class DetailBlogScreen extends StatelessWidget {
                   "$currentNumber.",
                   style: const TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -41,8 +40,7 @@ class DetailBlogScreen extends StatelessWidget {
                     stepText,
                     style: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),
@@ -63,7 +61,6 @@ class DetailBlogScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins',
                       ),
                     )
                     : const Text(''),
@@ -74,7 +71,6 @@ class DetailBlogScreen extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       height: 1.4,
-                      fontFamily: 'Poppins',
                     ),
                     textAlign: TextAlign.justify,
                   ),
@@ -91,11 +87,13 @@ class DetailBlogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             GestureDetector(
@@ -105,17 +103,23 @@ class DetailBlogScreen extends StatelessWidget {
               child: const Icon(Icons.chevron_left, size: 24),
             ),
             const SizedBox(width: 5),
-            Text(
-              blogItem.title,
-              style: TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
+            Container(
+              width: screenWidth * 0.82,
+              child: Text(
+                blogItem.title,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.050,
+
+                  fontWeight: FontWeight.w600,
+                ),
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ],
         ),
       ),
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(15.0),
@@ -142,7 +146,7 @@ class DetailBlogScreen extends StatelessWidget {
                         blogItem.author,
                         style: const TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Poppins',
+
                           color: Colors.black87,
                         ),
                       ),
@@ -151,7 +155,7 @@ class DetailBlogScreen extends StatelessWidget {
                         blogItem.uploadDate,
                         style: const TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Poppins',
+
                           color: Colors.black54,
                         ),
                       ),
@@ -164,7 +168,7 @@ class DetailBlogScreen extends StatelessWidget {
                 'Materials Required :',
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Poppins',
+
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -172,7 +176,7 @@ class DetailBlogScreen extends StatelessWidget {
                 blogItem.materials,
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Poppins',
+
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -180,7 +184,7 @@ class DetailBlogScreen extends StatelessWidget {
                 'Steps :',
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Poppins',
+
                   fontWeight: FontWeight.w600,
                 ),
               ),

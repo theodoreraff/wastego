@@ -9,9 +9,25 @@ class InfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Informasi Daur Ulang'),
+       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Informasi Daur Ulang',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),

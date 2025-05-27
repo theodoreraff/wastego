@@ -12,6 +12,7 @@ class DonateHistoryScreen extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             GestureDetector(
@@ -23,11 +24,7 @@ class DonateHistoryScreen extends StatelessWidget {
             const SizedBox(width: 5),
             Text(
               'Riwayat Donasi',
-              style: const TextStyle(
-                fontSize: 18,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -61,7 +58,7 @@ class DonateHistoryScreen extends StatelessWidget {
                                   donation.name,
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    fontFamily: 'Poppins',
+
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -70,7 +67,7 @@ class DonateHistoryScreen extends StatelessWidget {
                                   donation.amount,
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    fontFamily: 'Poppins',
+
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -81,7 +78,7 @@ class DonateHistoryScreen extends StatelessWidget {
                             donation.donationDate,
                             style: const TextStyle(
                               fontSize: 14,
-                              fontFamily: 'Poppins',
+
                               fontWeight: FontWeight.w400,
                             ),
                           ),

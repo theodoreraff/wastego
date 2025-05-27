@@ -15,11 +15,23 @@ class NotificationsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifikasi'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.chevron_left, size: 24),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Notifikasi',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
         ),
       ),
       body: Consumer<NotificationProvider>(
@@ -66,8 +78,10 @@ class NotificationsPage extends StatelessWidget {
                     backgroundColor: notif.color.withOpacity(0.15),
                     child: Icon(notif.icon, color: notif.color),
                   ),
-                  title: Text(notif.title,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  title: Text(
+                    notif.title,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -75,7 +89,10 @@ class NotificationsPage extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         formatTime(notif.date),
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
