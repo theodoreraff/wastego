@@ -1,21 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:wastego/core/models/donate_model.dart';
-import 'package:wastego/views/donate/detail_donate.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class DonatePage extends StatefulWidget {
+class DonatePage extends StatelessWidget {
   const DonatePage({super.key});
 
-  @override
-  State<DonatePage> createState() => _DonatePageState();
-}
-
-class _DonatePageState extends State<DonatePage> {
-  String selectedStatus = 'Ongoing';
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch $url');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<Donate> filteredDonateList =
-        donateList.where((donate) => donate.status == selectedStatus).toList();
+    final List<Map<String, String>> donationPlatforms = [
+      {
+        'name': 'Kitabisa',
+        'logo': 'assets/images/logo_kitabisa.png',
+        'description':
+            'Platform galang dana dan donasi online terpercaya di Indonesia.',
+        'url': 'https://kitabisa.com/',
+      },
+      {
+        'name': 'BenihBaik',
+        'logo': 'assets/images/logo_benihbaik.png',
+        'description': 'Lembaga filantropi untuk membantu sesama.',
+        'url': 'https://benihbaik.com/',
+      },
+      {
+        'name': 'WeCare.id',
+        'logo': 'assets/images/logo_wecare.png',
+        'description':
+            'Platform penggalangan dana khusus untuk pasien dengan penyakit kronis.',
+        'url': 'https://wecare.id/',
+      },
+      {
+        'name': 'Give.asia',
+        'logo': 'assets/images/logo_giveasia.png',
+        'description':
+            'Platform donasi online untuk berbagai kampanye sosial di Asia.',
+        'url': 'https://give.asia/',
+      },
+      {
+        'name': 'GlobalGiving',
+        'logo': 'assets/images/logo_globalgiving.png',
+        'description':
+            'Menghubungkan organisasi nirlaba, donor, dan perusahaan di hampir setiap negara.',
+        'url': 'https://www.globalgiving.org/',
+      },
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -38,190 +71,95 @@ class _DonatePageState extends State<DonatePage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: ListView.builder(
-          itemCount:
-              filteredDonateList.isEmpty ? 1 : filteredDonateList.length + 1,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Image.asset(
-                          'assets/images/undraw_environment_iaus.png',
-                          height: 120,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Dukung platform donasi terpercaya dan bantu wujudkan masa depan yang lebih bersih dan hijau.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: donationPlatforms.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              itemBuilder: (context, index) {
+                final platform = donationPlatforms[index];
+                return Card(
+                  color: Colors.white,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            // Optionally enable this line if logos are available
+                            // Image.asset(platform['logo']!, height: 40, width: 40),
+                            // const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                platform['name']!,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF003539),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: RichText(
-                          text: buildRichText(
-                            'Kita dapat membuat Bumi menjadi tempat yang lebih baik, satu tindakan satu waktu',
+                        if (platform['description'] != null &&
+                            platform['description']!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            platform['description']!,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFAFEE00),
+                              foregroundColor: Colors.black87,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onPressed: () => _launchURL(platform['url']!),
+                            child: const Text('Donate Now'),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Kampanye Kami',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Container(
-                        height: 40,
-                        width: 140,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade400),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          value: selectedStatus,
-                          icon: const Icon(Icons.keyboard_arrow_down),
-                          underline: const SizedBox(),
-                          items:
-                              ['Ongoing', 'Completed', 'Upcoming'].map((
-                                String value,
-                              ) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(
-                                    value,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedStatus = newValue!;
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  if (filteredDonateList.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 40),
-                      child: Center(
-                        child: Text(
-                          "Tidak ada kampanye yang tersedia",
-                          style: TextStyle(color: Colors.grey, fontSize: 16),
-                        ),
-                      ),
+                      ],
                     ),
-                  const SizedBox(height: 8),
-                ],
-              );
-            } else {
-              final Donate donate = filteredDonateList[index - 1];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => DetailDonateScreen(donateItem: donate),
-                    ),
-                  );
-                },
-                child: listItem(donate),
-              );
-            }
-          },
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
-
-  TextSpan buildRichText(String text) {
-    return TextSpan(
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: Color.fromARGB(255, 32, 170, 36),
-      ),
-      children: [
-        buildTextSpan('Kita dapat membuat ', Colors.black),
-        buildTextSpan('Bumi', Color(0xFF319F43)),
-        buildTextSpan(' menjadi tempat yang lebih ', Colors.black),
-        buildTextSpan('baik ', Color(0xFFFF6584)),
-        buildTextSpan(', ', Colors.black),
-        buildTextSpan('satu ', Color(0xFFFF6584)),
-        buildTextSpan('tindakan satu ', Colors.black),
-        buildTextSpan('waktu', Color(0xFFFF6584)),
-      ],
-    );
-  }
-
-  TextSpan buildTextSpan(String text, Color color) {
-    return TextSpan(text: text, style: TextStyle(color: color));
-  }
-}
-
-Widget listItem(Donate donateItem) {
-  return Card(
-    color: Colors.white,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-    elevation: 2,
-    child: Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset(donateItem.imageAsset),
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  donateItem.title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  donateItem.titleDescription,
-                  style: const TextStyle(
-                    fontSize: 12,
-
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
 }

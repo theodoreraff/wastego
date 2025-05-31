@@ -44,6 +44,8 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
+<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to your location to show it on the map and provide relevant schedule information.</string>
 	<true/>
 </dict>
 </plist>

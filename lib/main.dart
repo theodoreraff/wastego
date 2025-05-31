@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart'; // Import for date formatting initialization
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:wastego/routes/app_routes.dart';
@@ -33,6 +34,9 @@ void main() async {
 
   // Initializes the ApiService, which includes loading tokens from SharedPreferences.
   await ApiService.init();
+
+  // Initialize date formatting for the 'id_ID' locale.
+  await initializeDateFormatting('id_ID', null);
 
   // Sets the system UI overlay style (status bar and navigation bar colors and icon brightness).
   SystemChrome.setSystemUIOverlayStyle(
@@ -74,18 +78,24 @@ class MyApp extends StatelessWidget {
       title: 'WasteGo App', // The title of the application.
       debugShowCheckedModeBanner: false, // Hides the debug banner.
       initialRoute: AppRoutes.onboarding, // Sets the initial route of the app.
-      onGenerateRoute: AppRoutes.generateRoute, // Defines how routes are generated.
+      onGenerateRoute:
+          AppRoutes.generateRoute, // Defines how routes are generated.
       theme: ThemeData(
         useMaterial3: true, // Enables Material 3 design.
-        scaffoldBackgroundColor: Colors.white, // Sets the default background color for scaffolds.
+        scaffoldBackgroundColor:
+            Colors.white, // Sets the default background color for scaffolds.
         // Applies Google Fonts Poppins to the app's text theme.
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
         primarySwatch: Colors.green, // Sets the primary color swatch to green.
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white, // Sets the app bar background color.
-          foregroundColor: Colors.black, // Sets the app bar foreground color (e.g., icons, text).
+          foregroundColor:
+              Colors
+                  .black, // Sets the app bar foreground color (e.g., icons, text).
           elevation: 0, // Removes the shadow under the app bar.
-          systemOverlayStyle: SystemUiOverlayStyle.dark, // Sets the system overlay style for the app bar.
+          systemOverlayStyle:
+              SystemUiOverlayStyle
+                  .dark, // Sets the system overlay style for the app bar.
         ),
       ),
     );

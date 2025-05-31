@@ -64,13 +64,14 @@ class _LoginFormState extends State<LoginForm> {
         errorStringLc.contains('timeout') ||
         errorStringLc.contains('host lookup') ||
         errorStringLc.contains('failed host lookup')) {
-      displayError = 'Login gagal: Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+      displayError =
+          'Login gagal: Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
     } else {
-      displayError = 'Login gagal: ${errorStringFull.replaceFirst("Exception: ", "")}';
+      displayError =
+          'Login gagal: ${errorStringFull.replaceFirst("Exception: ", "")}';
     }
     return displayError;
   }
-
 
   Future<void> handleLogin() async {
     final email = emailController.text.trim();
@@ -111,7 +112,10 @@ class _LoginFormState extends State<LoginForm> {
       if (tokenData != null && tokenData is String && tokenData.isNotEmpty) {
         await ApiService.saveToken(tokenData);
         if (mounted) {
-          final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+          final profileProvider = Provider.of<ProfileProvider>(
+            context,
+            listen: false,
+          );
           await profileProvider.fetchProfile();
           _showMessage('Login berhasil!', isError: false);
           Future.delayed(const Duration(milliseconds: 500), () {
@@ -123,7 +127,9 @@ class _LoginFormState extends State<LoginForm> {
       } else {
         if (mounted) {
           setState(() {
-            errorMessage = response['message'] as String? ?? 'Login gagal: Token tidak ditemukan atau tidak valid.';
+            errorMessage =
+                response['message'] as String? ??
+                'Login gagal: Token tidak ditemukan atau tidak valid.';
           });
         }
       }
@@ -136,14 +142,21 @@ class _LoginFormState extends State<LoginForm> {
           int jsonStartIndex = errorStringFull.indexOf('{');
           int jsonEndIndex = errorStringFull.lastIndexOf('}');
 
-          if (jsonStartIndex != -1 && jsonEndIndex != -1 && jsonStartIndex < jsonEndIndex) {
-            String jsonSubstring = errorStringFull.substring(jsonStartIndex, jsonEndIndex + 1);
+          if (jsonStartIndex != -1 &&
+              jsonEndIndex != -1 &&
+              jsonStartIndex < jsonEndIndex) {
+            String jsonSubstring = errorStringFull.substring(
+              jsonStartIndex,
+              jsonEndIndex + 1,
+            );
             var decodedJson = jsonDecode(jsonSubstring);
 
             if (decodedJson is Map) {
-              if (decodedJson.containsKey('message') && decodedJson['message'] is String) {
+              if (decodedJson.containsKey('message') &&
+                  decodedJson['message'] is String) {
                 displayError = decodedJson['message'] as String;
-              } else if (decodedJson.containsKey('error') && decodedJson['error'] is String) {
+              } else if (decodedJson.containsKey('error') &&
+                  decodedJson['error'] is String) {
                 displayError = decodedJson['error'] as String;
               } else {
                 displayError = _parseGenericError(errorStringFull);
@@ -194,7 +207,10 @@ class _LoginFormState extends State<LoginForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          'Alamat Email',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: emailController,
@@ -256,7 +272,10 @@ class _LoginFormState extends State<LoginForm> {
             padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
             child: Text(
               errorMessage!,
-              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.start,
             ),
           ),
@@ -265,16 +284,17 @@ class _LoginFormState extends State<LoginForm> {
         Align(
           alignment: Alignment.centerRight,
           child: GestureDetector(
-            onTap: isLoading
-                ? null
-                : () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const ForgotPasswordPage(),
-                ),
-              );
-            },
+            onTap:
+                isLoading
+                    ? null
+                    : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ForgotPasswordPage(),
+                        ),
+                      );
+                    },
             child: Text(
               'Lupa Password?',
               style: TextStyle(
