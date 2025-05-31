@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../widgets/custom_button.dart';
-import '../../../core/services/api_service.dart';
+import '../../../core/services/api_service.dart'; // Will be used by AuthProvider
 import '../../../views/auth/forgot_password_page.dart';
 import 'package:provider/provider.dart';
 import 'package:wastego/core/providers/profile_provider.dart';
+import 'package:wastego/core/providers/auth_provider.dart'; // Added AuthProvider
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -106,32 +107,21 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     try {
-      final response = await ApiService.login(email, password);
-      final dynamic tokenData = response['token'];
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final profileProvider = Provider.of<ProfileProvider>(
+        context,
+        listen: false,
+      );
 
-      if (tokenData != null && tokenData is String && tokenData.isNotEmpty) {
-        await ApiService.saveToken(tokenData);
-        if (mounted) {
-          final profileProvider = Provider.of<ProfileProvider>(
-            context,
-            listen: false,
-          );
-          await profileProvider.fetchProfile();
-          _showMessage('Login berhasil!', isError: false);
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              Navigator.pushReplacementNamed(context, '/home');
-            }
-          });
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            errorMessage =
-                response['message'] as String? ??
-                'Login gagal: Token tidak ditemukan atau tidak valid.';
-          });
-        }
+      await authProvider.login(email, password, profileProvider);
+
+      if (mounted) {
+        _showMessage('Login berhasil!', isError: false);
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+        });
       }
     } catch (e) {
       if (mounted) {

@@ -61,25 +61,30 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         email: _email!, // Gunakan email dari variabel _email
         otp: _otpController.text.trim(),
       );
-      print('Hasil dari API Verifikasi OTP: $result'); // Debug: Print the API response
+      print(
+        'Hasil dari API Verifikasi OTP: $result',
+      ); // Debug: Print the API response
       if (result['success'] == true) {
-        print('OTP is valid, navigating to reset password');
+        print('OTP is valid.');
         if (!mounted) return;
 
-        // Tampilkan Snackbar sukses
+        // Show success SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kode OTP Valid, silahkan reset password anda')),
+          const SnackBar(
+            content: Text(
+              'Kode OTP Valid.',
+            ), // Or a more generic success message
+            backgroundColor: Colors.green,
+          ),
         );
 
-        await Future.delayed(const Duration(seconds: 2));
+        // Wait for SnackBar to be visible then pop
+        await Future.delayed(const Duration(milliseconds: 1500));
 
         if (!mounted) return;
-
-        Navigator.pushReplacementNamed(
-          context,
-          '/reset-password', // Pastikan rute ini sudah terdefinisi
-          arguments: {'email': _email}, // Gunakan email yang sudah diambil
-        );
+        // Pop back to ForgotPasswordPage, indicating success.
+        // ForgotPasswordPage might then decide to navigate to login or show further instructions.
+        Navigator.pop(context, true); // Pass true to indicate success
       } else {
         print('OTP is invalid');
         setState(() {
@@ -152,19 +157,20 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             ),
             const SizedBox(height: 16),
             TextButton(
-              onPressed: _isLoading
-                  ? null
-                  : () {
-                // TODO: Tambahkan logika untuk mengirim ulang OTP
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Mengirim ulang OTP...'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-                // Contoh pemanggilan API (ganti dengan implementasi sebenarnya)
-                // ApiService.resendOtp(email: _email!).then((response) { ... });
-              },
+              onPressed:
+                  _isLoading
+                      ? null
+                      : () {
+                        // TODO: Tambahkan logika untuk mengirim ulang OTP
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Mengirim ulang OTP...'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        // Contoh pemanggilan API (ganti dengan implementasi sebenarnya)
+                        // ApiService.resendOtp(email: _email!).then((response) { ... });
+                      },
               child: const Text('Kirim ulang kode OTP'),
             ),
           ],
@@ -173,4 +179,3 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     );
   }
 }
-

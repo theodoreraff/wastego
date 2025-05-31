@@ -3,6 +3,15 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Custom Exception for session expiry
+class SessionExpiredException implements Exception {
+  final String message;
+  SessionExpiredException(this.message);
+
+  @override
+  String toString() => 'SessionExpiredException: $message';
+}
+
 /// Override SSL: hanya untuk testing/development
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -16,18 +25,35 @@ class MyHttpOverrides extends HttpOverrides {
 class ApiService {
   static const String baseUrl = 'https://fahmi.led.my.id';
   static const String tokenKey = 'idToken';
+  static const String userIdKey = 'userId'; // This is the internal DB ID
+  static const String wgoIdKey = 'wgoId'; // This is the user-facing WGO-ID
+  static const String usernameKey = 'username';
+  static const String avatarUrlKey = 'avatarUrl';
 
   static String? _token;
+  static String? _userId; // Internal DB ID
+  static String? _wgoId; // User-facing WGO-ID
+  static String? _username;
+  static String? _avatarUrl;
+
   static SharedPreferences? _prefs;
 
-  /// Inisialisasi SharedPreferences dan load token jika ada
+  /// Inisialisasi SharedPreferences dan load token serta user data jika ada
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     _token = _prefs?.getString(tokenKey);
+    _userId = _prefs?.getString(userIdKey);
+    _wgoId = _prefs?.getString(wgoIdKey); // Load wgoId
+    _username = _prefs?.getString(usernameKey);
+    _avatarUrl = _prefs?.getString(avatarUrlKey);
   }
 
   /// Mendapatkan token yang tersimpan
   static String? get token => _token;
+  static String? get userId => _userId; // Internal DB ID
+  static String? get wgoId => _wgoId; // User-facing WGO-ID
+  static String? get username => _username;
+  static String? get avatarUrl => _avatarUrl;
 
   /// Simpan token ke SharedPreferences
   static Future<void> saveToken(String token) async {
@@ -35,16 +61,64 @@ class ApiService {
     await _prefs?.setString(tokenKey, token);
   }
 
-  /// Hapus token saat logout
-  static Future<void> clearToken() async {
+  /// Simpan data pengguna ke SharedPreferences
+  static Future<void> saveUserData({
+    required String userId, // Internal DB ID
+    String? wgoId, // User-facing WGO-ID
+    required String username,
+    String? avatarUrl,
+  }) async {
+    _userId = userId;
+    _wgoId = wgoId; // Store wgoId
+    _username = username;
+    _avatarUrl = avatarUrl;
+
+    await _prefs?.setString(userIdKey, userId);
+    if (wgoId != null) {
+      await _prefs?.setString(wgoIdKey, wgoId); // Save wgoId to prefs
+    } else {
+      await _prefs?.remove(wgoIdKey);
+    }
+    await _prefs?.setString(usernameKey, username);
+    if (avatarUrl != null) {
+      await _prefs?.setString(avatarUrlKey, avatarUrl);
+    } else {
+      await _prefs?.remove(avatarUrlKey);
+    }
+  }
+
+  /// Memuat data pengguna dari SharedPreferences
+  static Map<String, String?> loadUserData() {
+    return {
+      'userId': _prefs?.getString(userIdKey),
+      'wgoId': _prefs?.getString(wgoIdKey), // Return wgoId
+      'username': _prefs?.getString(usernameKey),
+      'avatarUrl': _prefs?.getString(avatarUrlKey),
+    };
+  }
+
+  /// Hapus token dan data pengguna saat logout
+  static Future<void> clearAuthData() async {
     _token = null;
+    _userId = null;
+    _wgoId = null; // Clear wgoId
+    _username = null;
+    _avatarUrl = null;
+
     await _prefs?.remove(tokenKey);
+    await _prefs?.remove(userIdKey);
+    await _prefs?.remove(wgoIdKey); // Remove wgoId from prefs
+    await _prefs?.remove(usernameKey);
+    await _prefs?.remove(avatarUrlKey);
   }
 
   // -----------------------------
   // LOGIN USER
   // -----------------------------
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(
+    String email,
+    String password,
+  ) async {
     final url = Uri.parse('$baseUrl/auth/login');
 
     final response = await http.post(
@@ -55,15 +129,59 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      final tokenData = data['token'] as String?;
+      final apiUserData = data['user'] as Map<String, dynamic>?;
 
-      // Simpan token jika tersedia di response
-      if (data['token'] != null) {
-        await saveToken(data['token']);
+      if (tokenData != null) {
+        await saveToken(tokenData);
       }
 
+      String? finalUserId;
+      String? finalUsername;
+      // wgoId and avatarUrl are not expected in the direct login response.
+      // They will be fetched by ProfileProvider later.
+
+      if (apiUserData != null) {
+        finalUserId = apiUserData['uid']?.toString();
+        finalUsername = apiUserData['username'] as String?;
+      }
+
+      await saveUserData(
+        userId: finalUserId ?? '', // Ensure userId is not null
+        wgoId: null, // Not in login response
+        username: finalUsername ?? '', // Ensure username is not null
+        avatarUrl: null, // Not in login response
+      );
       return data;
     } else {
-      throw Exception('Login gagal: ${response.body}');
+      // Handle non-200 responses, including potential 401/403 for login failure
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        // Though login itself failing with 401/403 might not mean session expired,
+        // but rather invalid credentials. For consistency, we can treat it similarly
+        // or have more specific error handling. For now, generic login failure.
+        await clearAuthData(); // Clear any potentially stale data
+        try {
+          final errorData = jsonDecode(response.body);
+          throw Exception(
+            errorData['message'] ?? 'Login gagal: ${response.reasonPhrase}',
+          );
+        } catch (e) {
+          throw Exception(
+            'Login gagal: Status ${response.statusCode}, ${response.reasonPhrase}',
+          );
+        }
+      }
+      // For other errors
+      try {
+        final errorData = jsonDecode(response.body);
+        throw Exception(
+          errorData['message'] ?? 'Login gagal: ${response.reasonPhrase}',
+        );
+      } catch (e) {
+        throw Exception(
+          'Login gagal: Status ${response.statusCode}, ${response.reasonPhrase}',
+        );
+      }
     }
   }
 
@@ -82,7 +200,7 @@ class ApiService {
       url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'username': username,
+        'username': username, // This username is for the registration body
         'email': email,
         'password': password,
         'confirmPassword': confirmPassword,
@@ -90,9 +208,36 @@ class ApiService {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      return jsonDecode(response.body);
+      final data = jsonDecode(response.body);
+      // No token is returned in the registration response based on the provided structure.
+
+      final profileData = data['profile'] as Map<String, dynamic>?;
+
+      String? userIdValue;
+      String? wgoIdValue;
+      String? usernameValue;
+      String? avatarValue;
+
+      if (profileData != null) {
+        userIdValue = profileData['uid']?.toString();
+        wgoIdValue = profileData['wgoId'] as String?;
+        usernameValue = profileData['username'] as String?;
+        avatarValue = profileData['avatar'] as String?; // Key is 'avatar'
+      }
+
+      await saveUserData(
+        userId: userIdValue ?? '', // Ensure userId is not null
+        wgoId: wgoIdValue,
+        username: usernameValue ?? '', // Ensure username is not null
+        avatarUrl: avatarValue, // Can be null
+      );
+
+      return data; // Return the original data
     } else {
-      throw Exception('Register gagal: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw Exception(
+        errorData['message'] ?? 'Register gagal: ${response.reasonPhrase}',
+      );
     }
   }
 
@@ -160,8 +305,8 @@ class ApiService {
   }
 
   // -----------------------------
-// REQUEST PICKUP
-// -----------------------------
+  // REQUEST PICKUP
+  // -----------------------------
   static Future<void> requestPickup({
     required Map<String, double> wasteDetails,
     required String address,
@@ -169,7 +314,9 @@ class ApiService {
     bool isPickup = true,
   }) async {
     if (_token == null) {
-      throw Exception('User belum login');
+      // If token is null, it's effectively a session issue.
+      await clearAuthData();
+      throw SessionExpiredException('User belum login. Silakan login kembali.');
     }
 
     final url = Uri.parse('$baseUrl/api/waste-pickup/request');
@@ -190,17 +337,32 @@ class ApiService {
       body: body,
     );
 
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      await clearAuthData();
+      throw SessionExpiredException(
+        'Sesi Anda telah berakhir. Silakan login kembali.',
+      );
+    }
+
     if (response.statusCode == 200 || response.statusCode == 201) {
       return;
     } else {
-      throw Exception('Gagal request pickup: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw Exception(
+        errorData['message'] ??
+            'Gagal request pickup: ${response.reasonPhrase}',
+      );
     }
   }
+
   // -----------------------------
-// UPDATE USERNAME
-// -----------------------------
+  // UPDATE USERNAME
+  // -----------------------------
   static Future<void> updateUsername(String username) async {
-    if (_token == null) throw Exception('User belum login');
+    if (_token == null) {
+      await clearAuthData();
+      throw SessionExpiredException('User belum login. Silakan login kembali.');
+    }
 
     final url = Uri.parse('$baseUrl/api/user/username');
 
@@ -213,16 +375,30 @@ class ApiService {
       body: jsonEncode({'username': username}),
     );
 
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      await clearAuthData();
+      throw SessionExpiredException(
+        'Sesi Anda telah berakhir. Silakan login kembali.',
+      );
+    }
+
     if (response.statusCode != 200) {
-      throw Exception('Gagal update username: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw Exception(
+        errorData['message'] ??
+            'Gagal update username: ${response.reasonPhrase}',
+      );
     }
   }
 
-// -----------------------------
-// UPDATE PHONE NUMBER
-// -----------------------------
+  // -----------------------------
+  // UPDATE PHONE NUMBER
+  // -----------------------------
   static Future<void> updatePhone(String phone) async {
-    if (_token == null) throw Exception('User belum login');
+    if (_token == null) {
+      await clearAuthData();
+      throw SessionExpiredException('User belum login. Silakan login kembali.');
+    }
 
     final url = Uri.parse('$baseUrl/api/user/phone');
 
@@ -235,35 +411,78 @@ class ApiService {
       body: jsonEncode({'phone': phone}),
     );
 
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      await clearAuthData();
+      throw SessionExpiredException(
+        'Sesi Anda telah berakhir. Silakan login kembali.',
+      );
+    }
+
     if (response.statusCode != 200) {
-      throw Exception('Gagal update nomor HP: ${response.body}');
+      final errorData = jsonDecode(response.body);
+      throw Exception(
+        errorData['message'] ??
+            'Gagal update nomor HP: ${response.reasonPhrase}',
+      );
     }
   }
 
-// -----------------------------
-// UPDATE AVATAR (UPLOAD FILE)
-// -----------------------------
-  static Future<void> updateAvatar(File avatarFile) async {
-    if (_token == null) throw Exception('User belum login');
+  // -----------------------------
+  // UPDATE AVATAR (UPLOAD FILE)
+  // -----------------------------
+  // Returns the new avatar URL or relevant user data from the response
+  static Future<Map<String, dynamic>> updateAvatar(File avatarFile) async {
+    if (_token == null) {
+      await clearAuthData();
+      throw SessionExpiredException('User belum login. Silakan login kembali.');
+    }
 
     final url = Uri.parse('$baseUrl/api/user/avatar');
-    final request = http.MultipartRequest('PUT', url)
-      ..headers['Authorization'] = 'Bearer $_token'
-      ..files.add(await http.MultipartFile.fromPath('avatar', avatarFile.path));
+    final request =
+        http.MultipartRequest('POST', url) // Standard for file uploads
+          ..headers['Authorization'] = 'Bearer $_token'
+          ..files.add(
+            await http.MultipartFile.fromPath('avatar', avatarFile.path),
+          );
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
 
-    if (response.statusCode != 200) {
-      throw Exception('Gagal update avatar: ${response.body}');
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      await clearAuthData();
+      throw SessionExpiredException(
+        'Sesi Anda telah berakhir. Silakan login kembali.',
+      );
+    }
+
+    if (response.statusCode == 200) {
+      // Assuming the backend returns JSON with the new avatar URL or full user profile
+      return jsonDecode(response.body);
+    } else {
+      try {
+        final errorData = jsonDecode(response.body);
+        throw Exception(
+          errorData['message'] ??
+              'Gagal update avatar: ${response.reasonPhrase}',
+        );
+      } catch (e) {
+        // Fallback if response.body is not JSON
+        throw Exception(
+          'Gagal update avatar: Status ${response.statusCode}, ${response.reasonPhrase}',
+        );
+      }
     }
   }
+
   // -----------------------------
-// GET USER PROFILE
-// -----------------------------
+  // GET USER PROFILE
+  // -----------------------------
   static Future<Map<String, dynamic>> getUserProfile() async {
     if (_token == null) {
-      throw Exception('User belum login');
+      // This might be called when app starts and token is legitimately null.
+      // Or if token was cleared due to previous 401/403.
+      // Throwing SessionExpiredException here ensures consistent handling if called when unauthenticated.
+      throw SessionExpiredException('User belum login. Silakan login kembali.');
     }
 
     final url = Uri.parse('$baseUrl/api/user/profile');
@@ -276,15 +495,27 @@ class ApiService {
       },
     );
 
+    if (response.statusCode == 401 || response.statusCode == 403) {
+      await clearAuthData();
+      throw SessionExpiredException(
+        'Sesi Anda telah berakhir. Silakan login kembali.',
+      );
+    }
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception('Gagal mengambil profil user: ${response.body}');
+      try {
+        final errorData = jsonDecode(response.body);
+        throw Exception(
+          errorData['message'] ??
+              'Gagal mengambil profil user: ${response.reasonPhrase}',
+        );
+      } catch (e) {
+        throw Exception(
+          'Gagal mengambil profil user: Status ${response.statusCode}, ${response.reasonPhrase}',
+        );
+      }
     }
   }
-
 }
-
-
-
-

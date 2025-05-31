@@ -1,27 +1,31 @@
+import 'package:cached_network_image/cached_network_image.dart'; // Added
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:provider/provider.dart'; // Added
+import 'package:wastego/core/providers/profile_provider.dart'; // Added
 import '../../../routes/app_routes.dart';
 
 /// A widget that displays the top section of the Home screen,
 /// including logo, user greeting, points, ID, and navigation menu.
 class HomeTopSection extends StatefulWidget {
-  final String userName;
+  // final String userName; // Will get from ProfileProvider
   final int points;
-  final String userId;
+  // final String userId; // Will get from ProfileProvider
 
   const HomeTopSection({
     super.key,
-    required this.userName,
+    // required this.userName,
     required this.points,
-    required this.userId,
+    // required this.userId,
   });
 
   @override
   HomeTopSectionState createState() => HomeTopSectionState();
 }
 
-class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProviderStateMixin {
+class HomeTopSectionState extends State<HomeTopSection>
+    with SingleTickerProviderStateMixin {
   // Animation controllers for fade-in and scale transitions
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
@@ -37,13 +41,15 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
       vsync: this,
     );
 
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.9,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
     // Start the animations
     _controller.forward();
@@ -65,6 +71,7 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
 
   @override
   Widget build(BuildContext context) {
+    final profileProvider = Provider.of<ProfileProvider>(context); // Added
     // Responsive layout based on screen dimensions
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -92,11 +99,12 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
                       width: screenWidth * 0.12,
                       height: screenWidth * 0.09,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, _) => const Icon(
-                        Icons.image_not_supported,
-                        color: Colors.red,
-                        size: 40,
-                      ),
+                      errorBuilder:
+                          (context, error, _) => const Icon(
+                            Icons.image_not_supported,
+                            color: Colors.red,
+                            size: 40,
+                          ),
                     ),
                     const SizedBox(width: 12),
                     RichText(
@@ -107,8 +115,14 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
                           color: Colors.black,
                         ),
                         children: const [
-                          TextSpan(text: 'Waste', style: TextStyle(color: Color(0xFF003539))),
-                          TextSpan(text: 'Go', style: TextStyle(color: Color(0xFFAFEE00))),
+                          TextSpan(
+                            text: 'Waste',
+                            style: TextStyle(color: Color(0xFF003539)),
+                          ),
+                          TextSpan(
+                            text: 'Go',
+                            style: TextStyle(color: Color(0xFFAFEE00)),
+                          ),
                         ],
                       ),
                     ),
@@ -120,23 +134,50 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
                   children: [
                     IconButton(
                       icon: const Icon(LucideIcons.bell),
-                      onPressed: () => Navigator.pushNamed(context, AppRoutes.notification),
+                      onPressed:
+                          () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.notification,
+                          ),
                     ),
                     const SizedBox(width: 8),
                     GestureDetector(
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
+                      onTap:
+                          () => Navigator.pushNamed(context, AppRoutes.profile),
                       child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/profile.png',
-                          width: screenWidth * 0.08,
-                          height: screenWidth * 0.08,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, _) => const Icon(
-                            Icons.person,
-                            size: 32,
-                            color: Colors.grey,
-                          ),
-                        ),
+                        child:
+                            profileProvider.avatarUrl.isNotEmpty
+                                ? CachedNetworkImage(
+                                  imageUrl: profileProvider.avatarUrl,
+                                  width: screenWidth * 0.08,
+                                  height: screenWidth * 0.08,
+                                  fit: BoxFit.cover,
+                                  placeholder:
+                                      (context, url) => CircleAvatar(
+                                        backgroundColor: Colors.grey[300],
+                                        radius: screenWidth * 0.04,
+                                      ),
+                                  errorWidget:
+                                      (context, url, error) => CircleAvatar(
+                                        backgroundColor: Colors.grey[300],
+                                        radius: screenWidth * 0.04,
+                                        child: Icon(
+                                          Icons.person,
+                                          size: screenWidth * 0.05,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                )
+                                : CircleAvatar(
+                                  // Fallback if no avatar URL
+                                  radius: screenWidth * 0.04,
+                                  backgroundColor: Colors.grey[300],
+                                  child: Icon(
+                                    Icons.person,
+                                    size: screenWidth * 0.05,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
                       ),
                     ),
                   ],
@@ -152,7 +193,9 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
               child: ScaleTransition(
                 scale: _scaleAnimation,
                 child: Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 4,
                   clipBehavior: Clip.antiAlias,
                   child: SizedBox(
@@ -165,7 +208,8 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
                             'assets/images/banner.svg',
                             fit: BoxFit.cover,
                             alignment: Alignment.topLeft,
-                            placeholderBuilder: (_) => Container(color: Colors.grey.shade300),
+                            placeholderBuilder:
+                                (_) => Container(color: Colors.grey.shade300),
                           ),
                         ),
                         Positioned(
@@ -175,7 +219,7 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${_getGreeting()}, ${widget.userName} ',
+                                '${_getGreeting()}, ${profileProvider.username.isNotEmpty ? profileProvider.username : "Pengguna"} ',
                                 style: TextStyle(
                                   fontSize: greetingFontSize,
                                   fontWeight: FontWeight.bold,
@@ -184,12 +228,19 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Poin : ${widget.points} Eco',
-                                style: TextStyle(fontSize: userInfoFontSize, color: Colors.white),
+                                'Poin : ${widget.points} Eco', // Points still from widget parameter
+                                style: TextStyle(
+                                  fontSize: userInfoFontSize,
+                                  color: Colors.white,
+                                ),
                               ),
                               Text(
-                                'ID : ${widget.userId}',
-                                style: TextStyle(fontSize: userInfoFontSize, color: Colors.white),
+                                // Display wgoId if available, otherwise fallback to userId, then to "-"
+                                'ID : ${profileProvider.wgoId.isNotEmpty ? profileProvider.wgoId : (profileProvider.userId.isNotEmpty ? profileProvider.userId : "-")}',
+                                style: TextStyle(
+                                  fontSize: userInfoFontSize,
+                                  color: Colors.white,
+                                ),
                               ),
                             ],
                           ),
@@ -253,12 +304,42 @@ class HomeTopSectionState extends State<HomeTopSection> with SingleTickerProvide
 
   /// List of grid menu items.
   List<_MenuItem> get _menuItems => const [
-    _MenuItem(icon: LucideIcons.clock, label: "Jadwal", color: Color(0xFF1E1E1E), route: AppRoutes.schedule),
-    _MenuItem(icon: LucideIcons.recycle, label: "Daur Ulang", color: Color(0xFF2CCC86), route: AppRoutes.recycle),
-    _MenuItem(icon: LucideIcons.calendar, label: "Event", color: Color(0xFFAB67F3), route: AppRoutes.events),
-    _MenuItem(icon: LucideIcons.lightbulb, label: "Tips", color: Color(0xFFCC9B00), route: AppRoutes.tips),
-    _MenuItem(icon: LucideIcons.fileText, label: "Blog", color: Color(0xFF3DBEE5), route: AppRoutes.blog),
-    _MenuItem(icon: LucideIcons.heartHandshake, label: "Donasi", color: Color(0xFFF367E8), route: AppRoutes.donate),
+    _MenuItem(
+      icon: LucideIcons.clock,
+      label: "Jadwal",
+      color: Color(0xFF1E1E1E),
+      route: AppRoutes.schedule,
+    ),
+    _MenuItem(
+      icon: LucideIcons.recycle,
+      label: "Daur Ulang",
+      color: Color(0xFF2CCC86),
+      route: AppRoutes.recycle,
+    ),
+    _MenuItem(
+      icon: LucideIcons.calendar,
+      label: "Event",
+      color: Color(0xFFAB67F3),
+      route: AppRoutes.events,
+    ),
+    _MenuItem(
+      icon: LucideIcons.lightbulb,
+      label: "Tips",
+      color: Color(0xFFCC9B00),
+      route: AppRoutes.tips,
+    ),
+    _MenuItem(
+      icon: LucideIcons.fileText,
+      label: "Blog",
+      color: Color(0xFF3DBEE5),
+      route: AppRoutes.blog,
+    ),
+    _MenuItem(
+      icon: LucideIcons.heartHandshake,
+      label: "Donasi",
+      color: Color(0xFFF367E8),
+      route: AppRoutes.donate,
+    ),
   ];
 }
 

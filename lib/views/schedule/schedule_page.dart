@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:wastego/core/models/schedule_model.dart';
 import 'package:wastego/core/providers/schedule_provider.dart';
 import 'package:wastego/widgets/current_location_map_widget.dart';
-
+import 'package:wastego/views/schedule/widgets/schedule_list.dart'; // Added import
 
 /// A page displaying the user's waste pickup schedule.
 /// It shows current location via a map widget, and a list of schedules.
@@ -159,8 +159,6 @@ class _SchedulePageState extends State<SchedulePage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor:
-            Theme.of(context).colorScheme.surface, // Use theme color
         scrolledUnderElevation: 0,
         title: Row(
           children: [
@@ -184,7 +182,7 @@ class _SchedulePageState extends State<SchedulePage> {
           Padding(
             padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
             child: Text(
-              "Lokasi Anda Saat Ini",
+              "Pilih Lokasi Drop-off",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16, // Subtle size
@@ -236,119 +234,9 @@ class _SchedulePageState extends State<SchedulePage> {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       )
-                      : scheduleProvider.schedules.isEmpty
-                      ? const Center(
-                        child: Text("Belum ada jadwal penjemputan."),
-                      )
-                      : ListView.builder(
-                        padding:
-                            EdgeInsets.zero, // Remove ListView default padding
-                        itemCount: scheduleProvider.schedules.length,
-                        itemBuilder: (context, index) {
-                          final schedule = scheduleProvider.schedules[index];
-                          final day = scheduleProvider.translateDayToIndonesian(
-                            DateFormat.EEEE().format(schedule.date),
-                          );
-                          final date = DateFormat('dd').format(schedule.date);
-
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 6,
-                            ), // Reduced margin
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2, // Subtle elevation
-                            color: Theme.of(context).colorScheme.surface,
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10, // Reduced padding
-                              ),
-                              leading: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context)
-                                          .colorScheme
-                                          .secondary, // Use theme color
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  date,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        Theme.of(
-                                          context,
-                                        ).colorScheme.onSecondary,
-                                  ),
-                                ),
-                              ),
-                              title: Text(
-                                day,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.primary, // Use theme color
-                                ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    schedule.time ?? "Waktu tidak tersedia",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.color
-                                          ?.withOpacity(0.7),
-                                    ),
-                                  ),
-                                  if (schedule.address != null &&
-                                      schedule.address!.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4.0),
-                                      child: Text(
-                                        schedule.address!,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.color
-                                              ?.withOpacity(0.6),
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              trailing: Container(
-                                width: 8,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color:
-                                      schedule.latitude != null &&
-                                              schedule.longitude != null
-                                          ? Theme.of(
-                                            context,
-                                          ).colorScheme.primary.withOpacity(0.7)
-                                          : Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onTap: () => _onScheduleTapped(schedule),
-                            ),
-                          );
-                        },
+                      : ScheduleList(
+                        schedules: scheduleProvider.schedules,
+                        onScheduleTapped: _onScheduleTapped,
                       ),
             ),
           ),

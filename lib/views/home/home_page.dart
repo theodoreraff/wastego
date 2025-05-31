@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Added
+import 'package:wastego/core/providers/profile_provider.dart'; // Added
 import '../../core/services/api_service.dart';
 import 'components/home_top_section.dart';
 import 'components/home_stats.dart';
@@ -16,33 +18,49 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // User data
-  String userId = '';
-  String username = '';
+  // User data for points, other data will come from ProfileProvider
   int balancePoint = 0;
-  bool isLoading = false;
+  bool isLoading = true; // Start with loading true
 
-  // Ambil data profil dari server
-  Future<void> fetchProfile() async {
+  // Fetch points (and potentially other non-profileProvider data)
+  Future<void> fetchHomePageData() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
     });
 
     try {
-      final response = await ApiService.getUserProfile();
-      debugPrint('Profile API response Home: $response');
+      // Assuming points might still come from a direct API call or another source
+      // For this example, let's simulate fetching points.
+      // In a real app, this might be part of the initial user data load.
+      final response =
+          await ApiService.getUserProfile(); // Or a specific points endpoint
+      if (!mounted) return;
 
-      // Ambil data dari 'profile'
-      final profile = response['profile'] ?? {};
-
+      final profileData =
+          response['profile'] ?? {}; // Adjust if API structure is different
       setState(() {
-        userId = profile['uid']?.toString() ?? '';
-        username = profile['username'] ?? '';
-        balancePoint = profile['balancePoint'] ?? 0;
+        balancePoint = profileData['balancePoint'] ?? 0;
       });
+
+      // Also ensure ProfileProvider has data, or trigger its fetch
+      final profileProvider = Provider.of<ProfileProvider>(
+        context,
+        listen: false,
+      );
+      if (profileProvider.username.isEmpty) {
+        // Check if profile data is missing
+        await profileProvider.fetchProfile();
+      }
     } catch (e) {
-      debugPrint('Gagal mengambil profil: $e');
+      debugPrint('Gagal mengambil data HomePage: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memuat data: ${e.toString()}')),
+        );
+      }
     } finally {
+      if (!mounted) return;
       setState(() {
         isLoading = false;
       });
@@ -52,7 +70,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    fetchProfile(); // Panggil saat halaman di-load
+    // Fetch data when the page loads
+    // Consider if ProfileProvider is already fetching data globally (e.g. in main.dart)
+    // If not, you might need to fetch it here or ensure it's fetched before this page loads.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchHomePageData();
+    });
   }
 
   /// Handles navigation between tabs.
@@ -80,29 +103,46 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-        child: Column(
-          children: [
-            // Combined header + menu
-            HomeTopSection(
-              userName: username,
-              points: balancePoint,
-              userId: userId,
-            ),
+      body: Consumer<ProfileProvider>(
+        // Consume ProfileProvider
+        builder: (context, profileProvider, child) {
+          // Use profileProvider.isLoading for parts managed by it,
+          // and local isLoading for parts like balancePoint if fetched separately.
+          final overallIsLoading =
+              isLoading ||
+              (profileProvider.isLoading && profileProvider.username.isEmpty);
 
-            const SizedBox(height: 5),
+          return overallIsLoading
+              ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFF003539)),
+              )
+              : RefreshIndicator(
+                color: const Color(0xFF003539),
+                onRefresh: () async {
+                  await fetchHomePageData(); // Refreshes points
+                  await profileProvider
+                      .fetchProfile(); // Refreshes profile data
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Combined header + menu
+                      HomeTopSection(
+                        points: balancePoint, // Only points is needed now
+                      ),
+                      const SizedBox(height: 5),
 
-            // Waste stats
-            const HomeStats(totalSampah: 0),
+                      // Waste stats
+                      const HomeStats(totalSampah: 0),
 
-            // Carousel of eco tips
-            const EcoTipsCarousel(),
-          ],
-        ),
+                      // Carousel of eco tips
+                      const EcoTipsCarousel(),
+                    ],
+                  ),
+                ),
+              );
+        },
       ),
-
       // Custom bottom navigation bar
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,

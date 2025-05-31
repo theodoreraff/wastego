@@ -51,9 +51,18 @@ class AppRoutes {
       case forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordPage());
       case otpVerification:
+        // Reverted to original assumption: OtpVerificationPage handles its own argument retrieval
+        // or is pushed with arguments directly if needed.
+        // If it requires 'email' to be passed via named routes, its constructor and this case
+        // would need to be adapted similar to ResetPasswordPage.
         return MaterialPageRoute(builder: (_) => OtpVerificationPage());
+
       case resetPassword:
-        return MaterialPageRoute(builder: (_) => ResetPasswordPage());
+        // Rolling back: ResetPasswordPage will be deleted.
+        // Navigating to LoginPage as a fallback if this route is somehow still called.
+        // Consider removing the AppRoutes.resetPassword constant if it's no longer used.
+        return MaterialPageRoute(builder: (_) => const LoginPage());
+
       case home:
         return MaterialPageRoute(builder: (_) => const HomePage());
       case schedule:
@@ -81,10 +90,8 @@ class AppRoutes {
       case onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingPage());
       case onboardingStep1:
-
       default:
         return MaterialPageRoute(builder: (_) => const LoginPage());
     }
   }
 }
-

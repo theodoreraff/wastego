@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../widgets/custom_button.dart';
-import '../../../core/services/api_service.dart';
+import '../../../core/services/api_service.dart'; // Will be used by AuthProvider
+import 'package:provider/provider.dart'; // Added Provider
+import 'package:wastego/core/providers/auth_provider.dart'; // Added AuthProvider
+import 'package:wastego/core/providers/profile_provider.dart'; // Added ProfileProvider
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -100,19 +103,40 @@ class _RegisterFormState extends State<RegisterForm> {
     setState(() => isLoading = true);
 
     try {
-      final result = await ApiService.registerUser(
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final profileProvider = Provider.of<ProfileProvider>(
+        context,
+        listen: false,
+      );
+
+      await authProvider.register(
         username: username,
         email: email,
         password: password,
         confirmPassword: confirmPassword,
+        profileProvider: profileProvider,
       );
 
-      _showSuccess('Registrasi berhasil!');
-      Navigator.pushReplacementNamed(context, '/home');
+      if (mounted) {
+        _showSuccess('Registrasi berhasil! Mengarahkan ke Beranda...');
+        // Navigate to home page after successful registration
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            );
+          }
+        });
+      }
     } catch (e) {
-      _showError('Registrasi gagal: ${e.toString()}');
+      if (mounted)
+        _showError(
+          'Registrasi gagal: ${e.toString().replaceFirst("Exception: ", "")}',
+        );
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -129,26 +153,40 @@ class _RegisterFormState extends State<RegisterForm> {
             decoration: const InputDecoration(
               hintText: 'Masukkan Username',
               hintStyle: TextStyle(color: Colors.grey),
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
             ),
           ),
           const SizedBox(height: 24),
 
-          const Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            'Alamat Email',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 5),
           TextField(
             controller: _emailController,
             decoration: const InputDecoration(
               hintText: 'Masukkan Email',
               hintStyle: TextStyle(color: Colors.grey),
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
             ),
           ),
           const SizedBox(height: 24),
 
-          const Text('Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            'Kata Sandi',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 5),
           TextField(
             controller: _passwordController,
@@ -156,17 +194,28 @@ class _RegisterFormState extends State<RegisterForm> {
             decoration: InputDecoration(
               hintText: 'Masukkan Password',
               hintStyle: const TextStyle(color: Colors.grey),
-              enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
               suffixIcon: IconButton(
-                icon: Icon(_passwordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
-                onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+                icon: Icon(
+                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+                onPressed:
+                    () => setState(() => _passwordVisible = !_passwordVisible),
               ),
             ),
           ),
           const SizedBox(height: 24),
 
-          const Text('Konfirmasi Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            'Konfirmasi Kata Sandi',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 5),
           TextField(
             controller: _confirmPasswordController,
@@ -174,11 +223,23 @@ class _RegisterFormState extends State<RegisterForm> {
             decoration: InputDecoration(
               hintText: 'Masukkan Ulang Password',
               hintStyle: const TextStyle(color: Colors.grey),
-              enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
               suffixIcon: IconButton(
-                icon: Icon(_confirmPasswordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
-                onPressed: () => setState(() => _confirmPasswordVisible = !_confirmPasswordVisible),
+                icon: Icon(
+                  _confirmPasswordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+                onPressed:
+                    () => setState(
+                      () => _confirmPasswordVisible = !_confirmPasswordVisible,
+                    ),
               ),
             ),
           ),
@@ -188,9 +249,12 @@ class _RegisterFormState extends State<RegisterForm> {
             children: [
               Checkbox(
                 value: _agreeToTerms,
-                onChanged: (value) => setState(() => _agreeToTerms = value ?? false),
+                onChanged:
+                    (value) => setState(() => _agreeToTerms = value ?? false),
               ),
-              const Expanded(child: Text('Saya menyetujui syarat dan ketentuan')),
+              const Expanded(
+                child: Text('Saya menyetujui syarat dan ketentuan'),
+              ),
             ],
           ),
           const SizedBox(height: 5),
