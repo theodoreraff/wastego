@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// Geolocator is now in CurrentLocationMapWidget
+import 'package:google_maps_flutter/google_maps_flutter.dart'; // Still needed for LatLng, MarkerId etc.
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:wastego/core/models/schedule_model.dart';
 import 'package:wastego/core/providers/schedule_provider.dart';
+import 'package:wastego/widgets/current_location_map_widget.dart';
+
 
 /// A page displaying the user's waste pickup schedule.
-/// It shows current location, a filter button, a map, and a list of schedules.
+/// It shows current location via a map widget, and a list of schedules.
 class SchedulePage extends StatefulWidget {
   const SchedulePage({super.key});
 
@@ -18,80 +21,152 @@ class SchedulePage extends StatefulWidget {
 class _SchedulePageState extends State<SchedulePage> {
   final Completer<GoogleMapController> _mapControllerCompleter = Completer();
   GoogleMapController? _mapController;
-  Set<Marker> _markers = {};
-  BitmapDescriptor? _wasteIcon; // For custom marker icon
+  Set<Marker> _scheduleMarkers = {}; // Renamed from _markers
+  BitmapDescriptor? _wasteIcon; // For custom schedule marker icon
 
-  // Default location (Surabaya)
-  static const LatLng _defaultInitialLocation = LatLng(-7.257472, 112.752088);
-  LatLng _currentMapCenter = _defaultInitialLocation;
+  // Default location (e.g., center of a city, if current location fails for the map widget)
+  static const LatLng _defaultFallbackLocation = LatLng(
+    -7.257472,
+    112.752088,
+  ); // Surabaya
+  // _currentMapCenter is now managed by CurrentLocationMapWidget
+  // _currentPosition is now managed by CurrentLocationMapWidget
+  // _isFetchingLocation is now managed by CurrentLocationMapWidget
+  // _locationError is now managed by CurrentLocationMapWidget
 
   @override
   void initState() {
     super.initState();
-    _loadMarkerIcons();
+    _loadScheduleMarkerIcon(); // Renamed and simplified
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ScheduleProvider>(context, listen: false).fetchSchedules();
+      if (mounted) {
+        Provider.of<ScheduleProvider>(
+          context,
+          listen: false,
+        ).fetchSchedules().then((_) {
+          // After schedules are fetched, update markers
+          if (mounted) _updateScheduleMarkers();
+        });
+      }
     });
   }
 
-  Future<void> _loadMarkerIcons() async {
-    // Placeholder for loading custom icons. For now, we'll use default.
-    // Example: _wasteIcon = await BitmapDescriptor.fromAssetImage(
-    //   const ImageConfiguration(size: Size(48, 48)),
-    //   'assets/icons/waste_bin_marker.png', // Replace with your actual asset
-    // );
-    // For now, let it be null to use the default marker.
-    // If you add custom icons, ensure they are in your assets folder and pubspec.yaml
+  @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadScheduleMarkerIcon() async {
+    // Placeholder for loading custom icons for schedules.
+    // Example: _wasteIcon = await BitmapDescriptor.fromAssetImage(...);
+    // For now, let it be null to use the default marker for schedules.
+    // If you have a custom icon for schedules, load it here.
+    // e.g., _wasteIcon = await BitmapDescriptor.fromAssetImage(
+    //   const ImageConfiguration(size: Size(48, 48)), 'assets/icons/waste_schedule_pin.png');
+    if (mounted) setState(() {});
+  }
+
+  // This method now only animates the map, typically when a schedule is tapped.
+  // The map controller is obtained from the CurrentLocationMapWidget.
+  void _animateMapToSchedulePosition(LatLng position, {double zoom = 15.0}) {
+    _mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: position, zoom: zoom),
+      ),
+    );
+  }
+
+  // This method now only updates markers for schedules.
+  // User's current location marker is handled by CurrentLocationMapWidget.
+  void _updateScheduleMarkers() {
+    if (!mounted) return;
+    Set<Marker> newScheduleMarkers = {};
+    final scheduleProvider = Provider.of<ScheduleProvider>(
+      context,
+      listen: false,
+    );
+
+    for (var schedule in scheduleProvider.schedules) {
+      if (schedule.latitude != null && schedule.longitude != null) {
+        newScheduleMarkers.add(
+          Marker(
+            markerId: MarkerId('schedule_${schedule.date.toIso8601String()}'),
+            position: LatLng(schedule.latitude!, schedule.longitude!),
+            icon:
+                _wasteIcon ??
+                BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueOrange,
+                ),
+            infoWindow: InfoWindow(
+              title: schedule.address ?? 'Pickup Location',
+              snippet: 'Time: ${schedule.time ?? 'N/A'}',
+            ),
+            onTap: () => _onScheduleTapped(schedule),
+          ),
+        );
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _scheduleMarkers = newScheduleMarkers;
+      });
+    }
   }
 
   void _onScheduleTapped(ScheduleModel schedule) async {
     if (schedule.latitude != null && schedule.longitude != null) {
       final LatLng location = LatLng(schedule.latitude!, schedule.longitude!);
-      setState(() {
-        _currentMapCenter = location;
-        _markers = {
-          Marker(
-            markerId: MarkerId(schedule.date.toIso8601String()),
-            position: location,
-            icon: _wasteIcon ?? BitmapDescriptor.defaultMarker,
-            infoWindow: InfoWindow(
-              title: schedule.address ?? 'Pickup Location',
-              snippet:
-                  'Time: ${schedule.time ?? 'N/A'}\nInstructions: ${schedule.specialInstructions ?? 'N/A'}',
-            ),
-          ),
-        };
-      });
+      _animateMapToSchedulePosition(location); // Uses the page's map controller
 
-      _mapController?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: location, zoom: 15.0),
-        ),
+      // Optionally, show InfoWindow if mapController is available
+      final GoogleMapController? controller =
+          await _mapControllerCompleter.future;
+      controller?.showMarkerInfoWindow(
+        MarkerId('schedule_${schedule.date.toIso8601String()}'),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Location data not available for this schedule.'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      if (mounted && ScaffoldMessenger.of(context).mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location data not available for this schedule.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
     }
   }
+
+  // Permission/Service dialogs are now handled by CurrentLocationMapWidget.
+  // _showPermissionDeniedSnackbar, _showPermissionDeniedDialog, _showLocationServiceDisabledDialog are removed.
 
   @override
   Widget build(BuildContext context) {
     final scheduleProvider = Provider.of<ScheduleProvider>(context);
 
+    // Update schedule markers when schedules change
+    // This check ensures we don't call setState during build if schedules are already processed.
+    if (scheduleProvider.schedules.isNotEmpty &&
+        _scheduleMarkers.length !=
+            scheduleProvider.schedules
+                .where((s) => s.latitude != null && s.longitude != null)
+                .length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _updateScheduleMarkers();
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor:
+            Theme.of(context).colorScheme.surface, // Use theme color
         scrolledUnderElevation: 0,
         title: Row(
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.pop(context);
+                if (Navigator.canPop(context)) Navigator.pop(context);
               },
               child: const Icon(Icons.chevron_left, size: 24),
             ),
@@ -103,75 +178,71 @@ class _SchedulePageState extends State<SchedulePage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 16),
-            const Text(
-              "Lokasi Kamu:",
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch children
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+            child: Text(
+              "Lokasi Anda Saat Ini",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Color(0xFF003539),
+                fontSize: 16, // Subtle size
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withOpacity(0.8), // Subtle color
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.location_on, size: 20, color: Color(0xFF003539)),
-                SizedBox(width: 4),
-                Text(
-                  "Surabaya, Jawa Timur", // Static location for now.
-                  style: TextStyle(fontSize: 16, color: Color(0xFF003539)),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            // Map and list should take available space
+            flex: 2, // Give map more space initially
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0), // Rounded corners
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildLocationFilterButton(),
-            const SizedBox(height: 16),
-            Container(
-              height: 250, // Height for the map
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: GoogleMap(
-                  mapType: MapType.normal,
-                  initialCameraPosition: CameraPosition(
-                    target: _currentMapCenter,
-                    zoom: 12.0,
-                  ),
+                clipBehavior:
+                    Clip.antiAlias, // Important for rounded corners on map
+                child: CurrentLocationMapWidget(
+                  initialCenter: _defaultFallbackLocation,
+                  scheduleMarkers: _scheduleMarkers,
                   onMapCreated: (GoogleMapController controller) {
+                    if (!mounted) return;
                     if (!_mapControllerCompleter.isCompleted) {
                       _mapControllerCompleter.complete(controller);
                     }
                     _mapController = controller;
-                    // You can apply custom map styles here if you have a JSON style string
-                    // controller.setMapStyle(_mapStyleJsonString);
                   },
-                  markers: _markers,
-                  zoomControlsEnabled: true,
-                  myLocationButtonEnabled: false,
-                  myLocationEnabled:
-                      false, // Set to true if you want to show user's current location on map
-                  // Apply custom map style (green, blue, earth tones)
-                  // style: _mapStyleJson, // You'd load this from a JSON file/string
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Expanded(
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            // List of schedules
+            flex: 3, // Give list more space
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child:
-                  scheduleProvider.isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                  scheduleProvider.isLoading &&
+                          scheduleProvider.schedules.isEmpty
+                      ? Center(
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      )
                       : scheduleProvider.schedules.isEmpty
-                      ? const Center(child: Text("Belum ada jadwal."))
+                      ? const Center(
+                        child: Text("Belum ada jadwal penjemputan."),
+                      )
                       : ListView.builder(
+                        padding:
+                            EdgeInsets.zero, // Remove ListView default padding
                         itemCount: scheduleProvider.schedules.length,
                         itemBuilder: (context, index) {
                           final schedule = scheduleProvider.schedules[index];
@@ -181,46 +252,84 @@ class _SchedulePageState extends State<SchedulePage> {
                           final date = DateFormat('dd').format(schedule.date);
 
                           return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 6,
+                            ), // Reduced margin
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            elevation: 3,
-                            color: Colors.white,
+                            elevation: 2, // Subtle elevation
+                            color: Theme.of(context).colorScheme.surface,
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
-                                vertical: 12,
+                                vertical: 10, // Reduced padding
                               ),
                               leading: Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFAFEE00),
+                                  color:
+                                      Theme.of(context)
+                                          .colorScheme
+                                          .secondary, // Use theme color
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
                                   date,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSecondary,
                                   ),
                                 ),
                               ),
                               title: Text(
                                 day,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF003539),
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.primary, // Use theme color
                                 ),
                               ),
-                              subtitle: Text(
-                                schedule.time ?? "Tap for details",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black.withOpacity(0.7),
-                                ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    schedule.time ?? "Waktu tidak tersedia",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color
+                                          ?.withOpacity(0.7),
+                                    ),
+                                  ),
+                                  if (schedule.address != null &&
+                                      schedule.address!.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4.0),
+                                      child: Text(
+                                        schedule.address!,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color
+                                              ?.withOpacity(0.6),
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                ],
                               ),
                               trailing: Container(
                                 width: 8,
@@ -229,9 +338,9 @@ class _SchedulePageState extends State<SchedulePage> {
                                   color:
                                       schedule.latitude != null &&
                                               schedule.longitude != null
-                                          ? const Color(
-                                            0xFF003539,
-                                          ) // Active if location exists
+                                          ? Theme.of(
+                                            context,
+                                          ).colorScheme.primary.withOpacity(0.7)
                                           : Colors.grey[300],
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -242,45 +351,13 @@ class _SchedulePageState extends State<SchedulePage> {
                         },
                       ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16), // Padding at the bottom
+        ],
       ),
+      // FloatingActionButton is now managed by CurrentLocationMapWidget
     );
   }
 
-  /// Builds the "Pilih Lokasi" button.
-  Widget _buildLocationFilterButton() {
-    return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Fitur Pemilihan Lokasi Sedang Dikembangkan'),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF003539),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [BoxShadow(blurRadius: 5, color: Colors.black12)],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.location_on, color: Color(0xFFAFEE00), size: 20),
-            SizedBox(width: 8),
-            Text(
-              'Pilih Lokasi',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFFAFEE00),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // _buildMapArea method is now removed as its logic is in CurrentLocationMapWidget
 }
