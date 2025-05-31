@@ -217,25 +217,26 @@ class ProfileProvider extends ChangeNotifier {
     try {
       final response = await ApiService.updateAvatar(imageFile);
       String? newAvatarUrl;
-      if (response.containsKey('avatarUrl')) {
+
+      // Check for the direct 'avatar' key first, as per the successful response structure
+      if (response.containsKey('avatar') && response['avatar'] is String) {
+        newAvatarUrl = response['avatar'] as String?;
+      } else if (response.containsKey('avatarUrl')) {
+        // Keep existing checks as fallbacks
         newAvatarUrl = response['avatarUrl'] as String?;
       } else if (response.containsKey('user') && response['user'] is Map) {
         final userData = response['user'] as Map;
         newAvatarUrl = userData['avatarUrl'] as String?;
       } else if (response.containsKey('profile') &&
           response['profile'] is Map<String, dynamic>) {
-        // More specific type
-        // Check profile too
         final profileData = response['profile'] as Map<String, dynamic>;
-        newAvatarUrl = profileData['avatar'] as String?; // Use 'avatar' key
+        newAvatarUrl = profileData['avatar'] as String?;
       } else if (response.containsKey('profile') &&
           response['profile'] is Map) {
-        // Fallback for Map
-        // Check profile too
         final profileData = Map<String, dynamic>.from(
           response['profile'] as Map,
         );
-        newAvatarUrl = profileData['avatar'] as String?; // Use 'avatar' key
+        newAvatarUrl = profileData['avatar'] as String?;
       }
 
       if (newAvatarUrl != null && newAvatarUrl.isNotEmpty) {

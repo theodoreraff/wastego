@@ -96,20 +96,49 @@ class AuthProvider with ChangeNotifier {
         password: password,
         confirmPassword: confirmPassword,
       );
-      // ApiService.registerUser now handles saving user data (no token from registration)
-      await _loadCurrentUser(); // Reload user data from ApiService (token will be null)
+      // ApiService.registerUser has saved initial user details from the registration response.
 
-      // After registration, the user is NOT logged in as no token is provided.
-      // The user needs to proceed to login.
-      // Therefore, do not fetch profile here as it requires a token.
-      _isLoggedIn = false;
-
+      // Now, attempt to log the user in automatically.
       debugPrint(
-        'Register success (user data saved, proceed to login): $username, $email. UserID: $_userId, WGO ID: $_wgoId',
+        'Registration successful for $email. Attempting auto-login...',
       );
+      try {
+        await ApiService.login(email, password);
+        // ApiService.login has saved the token and user data from the login response.
+        await _loadCurrentUser(); // Reload data, this will set _isLoggedIn = true and load token.
+
+        if (_isLoggedIn && _token != null) {
+          await profileProvider
+              .fetchProfile(); // Fetch full profile with the new token.
+          debugPrint(
+            'Auto-login after register success: $email. UserID: $_userId, Username: $_username, WGO ID: $_wgoId. Token acquired.',
+          );
+        } else {
+          // This case should ideally not happen if ApiService.login was successful and _loadCurrentUser worked.
+          debugPrint(
+            'Auto-login after register for $email failed to set auth state, though ApiService.login might have succeeded. User needs to login manually.',
+          );
+          _isLoggedIn =
+              false; // Ensure it's false if token/login state isn't fully set.
+        }
+      } catch (loginError) {
+        // Handle failure of the automatic login attempt.
+        // The user is registered, but auto-login failed.
+        debugPrint(
+          'User $email registered successfully, but auto-login failed: $loginError. User needs to login manually.',
+        );
+        _isLoggedIn = false; // Ensure user is not marked as logged in.
+        // Optionally, rethrow a specific error or handle it to inform the UI
+        // that registration was successful but login is required.
+        // For now, we'll let the original registration error handling catch issues if registerUser itself failed.
+        // If registerUser succeeded but login failed, the outer catch will not be hit for loginError.
+        // So, we might want to rethrow or handle this more explicitly if the UI needs to differentiate.
+        // For this implementation, we'll allow the flow to complete,
+        // and the UI will see _isLoggedIn as false if auto-login fails.
+      }
     } catch (e) {
-      debugPrint('Register failed: $e');
-      _isLoggedIn = false;
+      debugPrint('Register or subsequent auto-login failed: $e');
+      _isLoggedIn = false; // Ensure state is clean on any failure in the block
       rethrow; // Rethrow to allow UI to catch and display error
     } finally {
       _setLoading(false);

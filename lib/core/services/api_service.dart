@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http_parser/http_parser.dart';
 
 /// Custom Exception for session expiry
 class SessionExpiredException implements Exception {
@@ -211,25 +212,35 @@ class ApiService {
       final data = jsonDecode(response.body);
       // No token is returned in the registration response based on the provided structure.
 
-      final profileData = data['profile'] as Map<String, dynamic>?;
+      final apiUserData = data['user'] as Map<String, dynamic>?;
 
       String? userIdValue;
       String? wgoIdValue;
       String? usernameValue;
-      String? avatarValue;
+      String?
+      roleValue; // Though not explicitly saved by saveUserData currently
+      // Avatar is not in the provided register response example for the 'user' object.
+      // If it were, it would be: String? avatarValue;
 
-      if (profileData != null) {
-        userIdValue = profileData['uid']?.toString();
-        wgoIdValue = profileData['wgoId'] as String?;
-        usernameValue = profileData['username'] as String?;
-        avatarValue = profileData['avatar'] as String?; // Key is 'avatar'
+      if (apiUserData != null) {
+        userIdValue = apiUserData['uid']?.toString();
+        wgoIdValue = apiUserData['wgoId'] as String?;
+        usernameValue = apiUserData['username'] as String?;
+        roleValue = apiUserData['role'] as String?;
+        // if (apiUserData.containsKey('avatar')) {
+        //   avatarValue = apiUserData['avatar'] as String?;
+        // }
       }
 
+      // Save the extracted user data.
+      // Note: ApiService.saveUserData does not currently store 'role'.
+      // Avatar is also not present in the 'user' object of your register response example.
       await saveUserData(
         userId: userIdValue ?? '', // Ensure userId is not null
-        wgoId: wgoIdValue,
+        wgoId: wgoIdValue, // Can be null
         username: usernameValue ?? '', // Ensure username is not null
-        avatarUrl: avatarValue, // Can be null
+        avatarUrl:
+            null, // Avatar not in register response 'user' object example
       );
 
       return data; // Return the original data
@@ -431,24 +442,54 @@ class ApiService {
   // UPDATE AVATAR (UPLOAD FILE)
   // -----------------------------
   // Returns the new avatar URL or relevant user data from the response
+
   static Future<Map<String, dynamic>> updateAvatar(File avatarFile) async {
     if (_token == null) {
+      print('[updateAvatar] Token null. User belum login.');
       await clearAuthData();
       throw SessionExpiredException('User belum login. Silakan login kembali.');
     }
 
     final url = Uri.parse('$baseUrl/api/user/avatar');
-    final request =
-        http.MultipartRequest('POST', url) // Standard for file uploads
-          ..headers['Authorization'] = 'Bearer $_token'
-          ..files.add(
-            await http.MultipartFile.fromPath('avatar', avatarFile.path),
-          );
+    print('[updateAvatar] Endpoint: $url');
+    print('[updateAvatar] File path: ${avatarFile.path}');
+    print('[updateAvatar] Token: $_token');
+
+    // Cek ekstensi file
+    final ext = avatarFile.path.split('.').last.toLowerCase();
+    final allowedExtensions = ['jpg', 'jpeg', 'png'];
+    if (!allowedExtensions.contains(ext)) {
+      throw Exception('File harus berformat JPG, JPEG, atau PNG');
+    }
+
+    // Tentukan content-type sesuai ekstensi
+    MediaType contentType;
+    if (ext == 'png') {
+      contentType = MediaType('image', 'png');
+    } else {
+      contentType = MediaType('image', 'jpeg'); // jpg dan jpeg sama MIME type
+    }
+
+    final request = http.MultipartRequest('PUT', url)
+      ..headers['Authorization'] = 'Bearer $_token'
+      ..files.add(
+        await http.MultipartFile.fromPath(
+          'avatar',
+          avatarFile.path,
+          contentType: contentType,
+        ),
+      );
+
+    print('[updateAvatar] Sending PUT request...');
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
 
+    print('[updateAvatar] Status Code: ${response.statusCode}');
+    print('[updateAvatar] Response Body: ${response.body}');
+
     if (response.statusCode == 401 || response.statusCode == 403) {
+      print('[updateAvatar] Token expired or unauthorized.');
       await clearAuthData();
       throw SessionExpiredException(
         'Sesi Anda telah berakhir. Silakan login kembali.',
@@ -456,23 +497,23 @@ class ApiService {
     }
 
     if (response.statusCode == 200) {
-      // Assuming the backend returns JSON with the new avatar URL or full user profile
+      print('[updateAvatar] Avatar update successful.');
       return jsonDecode(response.body);
     } else {
       try {
         final errorData = jsonDecode(response.body);
-        throw Exception(
-          errorData['message'] ??
-              'Gagal update avatar: ${response.reasonPhrase}',
-        );
+        final errorMessage = errorData['message'] ?? 'Unknown error';
+        print('[updateAvatar] Error: $errorMessage');
+        throw Exception('Gagal update avatar: $errorMessage');
       } catch (e) {
-        // Fallback if response.body is not JSON
+        print('[updateAvatar] JSON parsing failed or unknown error: $e');
         throw Exception(
           'Gagal update avatar: Status ${response.statusCode}, ${response.reasonPhrase}',
         );
       }
     }
   }
+
 
   // -----------------------------
   // GET USER PROFILE

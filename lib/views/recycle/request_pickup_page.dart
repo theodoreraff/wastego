@@ -17,7 +17,7 @@ class RequestPickupPage extends StatefulWidget {
 class _RequestPickupPageState extends State<RequestPickupPage> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
-  bool _isPickup = true; // Determines if it's a pickup or drop-off request.
+  bool _isPickup = true;
   bool _isLoading = false;
 
   @override

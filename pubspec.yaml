@@ -33,9 +33,10 @@ dependencies:
   share_plus: ^11.0.0
   lottie: ^2.6.0
   google_maps_flutter: ^2.12.2
-  image_cropper: ^9.0.0
+  image_cropper: ^9.1.0
   geolocator: ^14.0.1
   cached_network_image: ^3.3.1 # Added for caching network images
+  http_parser: ^4.1.2
 
 dev_dependencies:
   flutter_test:

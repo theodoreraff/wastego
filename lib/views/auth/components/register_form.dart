@@ -118,7 +118,7 @@ class _RegisterFormState extends State<RegisterForm> {
       );
 
       if (mounted) {
-        _showSuccess('Registrasi berhasil! Mengarahkan ke Beranda...');
+        _showSuccess('Registrasi berhasil!');
         // Navigate to home page after successful registration
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
